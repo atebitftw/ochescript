@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
+  <meta name="description" content="oche_script API docs, for the Dart programming language.">
+  <title>oche_script - Dart API docs</title>
+
+
+  
+  <link rel="preconnect" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
+  
+  <link rel="stylesheet" href="static-assets/github.css?v1">
+  <link rel="stylesheet" href="static-assets/styles.css?v1">
+  <link rel="icon" href="static-assets/favicon.png?v1">
+  
+</head>
+
+<body data-base-href="" data-using-base-href="false" class="light-theme">
+<div id="overlay-under-drawer"></div>
+<header id="title">
+  <span id="sidenav-left-toggle" class="material-symbols-outlined" role="button" tabindex="0">menu</span>
+  <ol class="breadcrumbs gt-separated dark hidden-xs">
+    <li class="self-crumb">oche_script package</li>
+  </ol>
+  <div class="self-name">oche_script</div>
+  <form class="search navbar-right" role="search">
+    <input type="text" id="search-box" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+  <button class="toggle" id="theme-button" title="Toggle between light and dark mode" aria-label="Light and dark mode toggle">
+    <span id="dark-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      dark_mode
+    </span>
+    <span id="light-theme-button" class="material-symbols-outlined" aria-hidden="true">
+      light_mode
+    </span>
+  </button>
+</header>
+<main>
+  <div id="dartdoc-main-content" class="main-content">
+      
+<section class="desc markdown">
+  <h1 id="ochescript">OcheScript</h1>
+<p><strong>Oche <em>(pronounced "ock-ee")</em>. The official name for the throwing line in a game of darts.</strong></p>
+<p>Embedded script language for Flutter/Dart applications.</p>
+<h2 id="key-features">Key Features</h2>
+<p>OcheScript is a lightweight, dynamically typed, object-oriented, scripting language designed for embedding into Dart applications.</p>
+<ul>
+<li>Convenient Dart interop capabilities.</li>
+<li>Extensible via native methods and functions.</li>
+<li>Object-oriented programming features (classes, methods, properties, etc.).</li>
+<li>Closures and lambdas.</li>
+<li>(Limited) Asynchronous support (async/await).</li>
+<li>String interpolation.</li>
+<li>Lightweight preprocessor directive capabilities.</li>
+<li><code>.oche</code> script file syntax highlighting extension for VSCode/Antigravity.</li>
+</ul>
+<h2 id="why-does-this-exist">Why Does This Exist?</h2>
+<p>I work on some very large-scale Flutter projects that sometimes require a bit of dynamic runtime automation, and I found that I needed execute arbitrary code at runtime in certain situations.  I built OcheScript to meet this need.  In the Flutter/Dart ecosystem, there are probably five people that need this kind of thing, and I am one of them.  To the other four, I say: "Hello World!".</p>
+<p><em>Side Note: Dart technically does have arbitrary code execution capability via <code>dart:mirrors</code>, but I personally do not consider it to be a viable approach for many production application scenarios, especially anything Flutter-based (mirrors disallowed).  Another reason to avoid mirrors: As soon as you bring in mirrors, you lose tree-shaking.</em></p>
+<h2 id="getting-started">Getting Started</h2>
+<p>See the <a href="lib/doc/getting_started.md">Getting Started</a> document for more information.</p>
+<h2 id="language-specification">Language Specification</h2>
+<p>See the <a href="lib/doc/language_specification.md">Language Specification</a> document for more information.</p>
+<h2 id="library-api">Library API</h2>
+<p>See the <a href="lib/doc/api">API</a> document for more information.  This is an HTML document generated from the Dartdoc comments in the source code.</p>
+<h2 id="dart-interop">Dart Interop</h2>
+<p>See the <a href="lib/doc/dart_interop.md">Dart Interop</a> document for more information.</p>
+<h2 id="error-handling">Error Handling</h2>
+<p>Runtime errors cause script execution to halt with an error message.</p>
+<p>Errors are not emitted to stdout by default.  They are usually reported via the <a href="https://pub.dev/packages/logging">Logging Package</a> at level WARNING and above.  To listen to these errors, you can use the <code>Logging</code> class from the <code>logging</code> package.</p>
+<pre class="language-dart"><code class="language-dart">// (assumes you've added the logging package as a dependency in your pubspec.yaml)
+import 'package:logging/logging.dart';
+import 'package:oche_script/oche_script.dart' as oche;
+
+Future&lt;void&gt; main() async {
+  Logger.root.level = Level.WARNING;
+  Logger.root.onRecord.listen((record) {
+    print("${record.level.name}: ${record.message}");
+    // emits the error message and stack trace
+  });
+
+  final result = await oche.compileAndRun(r"print("Hello World!");");
+
+  print("Return Code: ${result['return_code']}");
+  if (result.containsKey('error')) {
+    print("Error: ${result['error']}");
+  }
+}
+</code></pre>
+<p>Error messages are also placed in the return map of the <code>compileAndRun</code> function (without stack trace).  The map has the following structure:</p>
+<pre class="language-dart"><code class="language-dart">{
+  "error": "{error message}",
+  "return_code": 1,
+  // other stuff emitted by any out() functions in the script.
+}
+</code></pre>
+<h3 id="why-not-just-print-errors-to-stdout">Why not just print errors to stdout?</h3>
+<p>Since OcheScript is primarily designed for use as an embedded language in other Dart/Flutter applications, stdout is not reliably available on various platforms.  Using the logging package gives the developer more flexibility in how and where they receive error messages.</p>
+<p>If you want the error message to be printed to stdout, you can use the <code>Logging</code> class from the <code>logging</code> package to listen to the <code>Logger</code> at level WARNING and above.</p>
+<h3 id="included-library-error-reporting">Included Library Error Reporting</h3>
+<p>When using the <code>#include</code> directive to include other "library" files into your script, OcheScript tracks the original source file and line number.  If a runtime error occurs within an included file, the error message will be prefixed with the file name and line number, like so:</p>
+<pre class="language-dart"><code>Runtime error: [my_lib:42] Undefined variable 'foo'.
+</code></pre>
+<p>This is useful for debugging scripts that are composed of multiple files.</p>
+<h2 id="these-batteries-are-not-included">These Batteries Are Not Included</h2>
+<ul>
+<li>No try/catch exception handling.</li>
+<li>No module system (beyond <code>#INCLUDE</code> directive)</li>
+<li>No operator overloading.</li>
+<li>Map keys must be strings.</li>
+<li>Currying is not supported.</li>
+<li>No direct support for accessing file systems or assets.  This can be achieved via Dart interop.</li>
+<li>No support for ternary operator.</li>
+</ul>
+<h2 id="stack-size-limits">Stack Size Limits</h2>
+<p>Since the scope of this language is to live embedded inside other Dart applications, the virtual machine stack is fixed to a size of 8192 elements.  This is to prevent memory exhaustion in the host Dart environment.  If the stack overflows, the virtual machine will throw a runtime error.</p>
+<p>Most scripts will rarely come close to this limit (most will never exceed 100).  However there are some rare scenarios that could cause a stack overflow:</p>
+<ul>
+<li>Trying to implement a deep recursion algorithm.</li>
+<li>Defining a large static list (e.g. <code>var x = [1, 2, 3, ...]; // are you declaring 8192 static elements in a list?</code>) may cause a stack overflow because the compiler pushes each element of the list onto the stack before actually building the list.  Better to define the list dynamically (e.g. <code>var x = []; for (var i = 0; i &lt; 10000; i++) x.add(i);</code>) as this only pushes one element onto the stack at a time.</li>
+</ul>
+<h2 id="roadmap-ideas">Roadmap Ideas</h2>
+<ul>
+<li>Adding try/catch exception handling will probably be my next effort.</li>
+<li>Native method binding to user-defined class instances sounds intriguing.  Though at that point, I may as well just implement native extension method support withing the language.</li>
+<li>Perhaps implement support for a Record type, and destructuring syntax.  It would be nice to pass anonymous records back and forth between Dart and OcheScript.</li>
+<li>More robust support for Futures and async/await.  OcheScript currently doesn't have it's own microtask queue, so it can't run async code in the same way that Dart can.  It does have the capability to await futures, but it doesn't have it's own event loop.</li>
+<li>I would like eventually to implement a LINQ-style query syntax for OcheScript, to make it more useful for data processing and manipulation.  Perhaps with some kind of provider interface to Dart-side data services like Firebase, REDIS, etc.</li>
+<li>I'm open to other ideas.</li>
+</ul>
+<h2 id="syntax-highlighting-support-in-vscode">Syntax Highlighting Support in VSCode</h2>
+<p>In <a href="https://github.com/atebitftw/oche_script/tree/main/tool/vs_code_syntax_highlighter/ochescript">VS Code Extension</a> there is a a VSCode extension project that provides basic syntax highlighting for OcheScript files (.oche). You can use this extension by importing the <code>.vsix</code> file into VSCode manually.</p>
+<h2 id="about-me">About Me</h2>
+<p>My name is John, and if you've been a Dart enthusiast prior to M1 (way before v1 release), then we are probably friends.</p>
+<h2 id="attributions-and-gratitude">Attributions and Gratitude</h2>
+<p>The bones of this project are adapted from the excellent work of Bob Nystrom (<a href="https://github.com/munificent">Github</a>, <a href="https://bsky.app/profile/stuffwithstuff.com">BlueSky</a>) in his book: "<a href="https://craftinginterpreters.com/">Crafting Interpreters</a>", portions of which are licensed under the MIT License <a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE">see here</a>.</p>
+<p>I <strong>highly</strong> recommend this book if you are interested in learning how to build an interpreter.  It is a great resource.</p>
+<p>Thanks Bob!</p>
+</section>
+
+
+      <section class="summary">
+          <h2>Libraries</h2>
+        <dl>
+        </dl>
+      </section>
+  </div> <!-- /.main-content -->
+  <div id="dartdoc-sidebar-left" class="sidebar sidebar-offcanvas-left">
+    <!-- The search input and breadcrumbs below are only responsively visible at low resolutions. -->
+<header id="header-search-sidebar" class="hidden-l">
+  <form class="search-sidebar" role="search">
+    <input type="text" id="search-sidebar" autocomplete="off" disabled class="form-control typeahead" placeholder="Loading search...">
+  </form>
+</header>
+<ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
+    <li class="self-crumb">oche_script package</li>
+</ol>
+
+    <h5 class="hidden-xs"><span class="package-name">oche_script</span> <span class="package-kind">package</span></h5>
+    <ol>
+      <li class="section-title">Libraries</li>
+</ol>
+
+  </div>
+  <div id="dartdoc-sidebar-right" class="sidebar sidebar-offcanvas-right">
+  </div>
+</main>
+<footer>
+  <span class="no-break">
+    oche_script
+      0.1.187
+  </span>
+  
+</footer>
+
+
+<script src="static-assets/highlight.pack.js?v1"></script>
+<script src="static-assets/docs.dart.js"></script>
+
+</body>
+</html>
+

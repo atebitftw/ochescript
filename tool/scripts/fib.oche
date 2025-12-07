@@ -1,0 +1,15 @@
+// Laptop: 22.1sec
+// .67sec with bytecode vm
+
+// number -> number
+fun fib(n) {
+  if (n < 2) return n;
+  return fib(n - 1) + fib(n - 2);
+}
+
+var maxFib = 30;
+
+print "Running Fibonacci benchmark ($maxFib)...";
+var start = clock();
+print(fib(maxFib));
+print("Finished in ${clock() - start} ms.");

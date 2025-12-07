@@ -1,0 +1,137 @@
+// Models Library
+// This library provides some utility to work with a model system.
+// (see https://github.com/atebitftw/dart-common/tree/main/bin)
+
+
+var registeredModels = {};
+
+// Registers a model to the model system.
+// Model must inherit from ModelBase.
+// ModelBase -> void
+fun registerModel(model){
+    var instance = model();
+    if (!(instance is ModelBase)) {
+        print("ERROR -> registerModel -> Model must inherit from ModelBase");
+        quit(1);
+    }
+
+    registeredModels[instance.modelName] = fun() { return model(); };
+}
+
+// Returns a list containing an instance of the model, if found.
+// If the model is not found, an empty list is returned.
+// string -> []
+fun getModel(modelName){
+    if (!registeredModels.containsKey(modelName)) {
+        print("ERROR -> getModel -> Model '" + modelName + "' not registered.  Returning empty list.");
+        return [];
+    }
+    return [registeredModels[modelName]()];
+}
+
+// Base class for all models
+// Unless other models are registered, this will be used for all models.
+class ModelBase {
+    // sub-classes need to call this in their init() first, or these won't be initialized.
+    // super.init();
+    init(){
+        this.id = generateId(20);
+        this.createdOn = now();
+        this.createdBy = "";
+        this.modelName = "ModelBase";
+    }
+
+    // we convert field names to snake_case before encoding to JSON
+    // This is consistent with our object model for Firebase
+    // void -> string
+    toJSON() {
+        var allFields = this.fields;
+        var keys = allFields.keys();
+        var data = {};
+        for (var i = 0; i < keys.length(); i++) {
+            var key = keys[i];
+            if (allFields[key] is ModelBase){
+                data[lowerCamelToSnakeCase(key)] = allFields[key].toJSON();
+            }else {
+                data[lowerCamelToSnakeCase(key)] = allFields[key];
+            }
+        }
+        return jsonEncode(data);
+    }
+
+    // Returns the model from a JSON string
+    // string -> ModelBase
+    fromJSON(json) {
+        var data = jsonDecode(json);
+        var keys = data.keys();
+        var transformedKeys = data.keys().map(fun(key) { return snakeToLowerCamelCase(key); });
+        for (var i = 0; i < transformedKeys.length(); i++) {
+            if((data[keys[i]] is String) && data[keys[i]].contains("model_name")){
+                var result = getModel(jsonDecode(data[keys[i]])["model_name"]);
+                if (result.isEmpty()){
+                    print("ERROR -> fromJSON -> Nested JSON model not found");
+                    quit(1);
+                }
+                var model = result[0];
+
+                this.fields[transformedKeys[i]] = model.fromJSON(data[keys[i]]);
+            }else {
+                this.fields[transformedKeys[i]] = data[keys[i]];
+            }
+        }
+        return this;
+    }
+
+    // Returns a string representation of the model
+    // void -> string
+    toString() {
+        return this.toJSON();
+    }
+}
+
+// remove the ones that can look like numbers
+var idString = "abcdefghijkmnpqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ123456789";
+// Returns a random alpha-numeric string of [size] characters
+// int -> string
+fun generateId(size){
+    if (size < 0){
+        return "";
+    }
+    var result = "";
+    for (var i = 0; i < size; i++) {
+        result = result + idString[rndInt(idString.length())];
+    }
+    return result;
+}
+
+// string -> string
+fun snakeToLowerCamelCase(str){
+    var len = str.length();
+    var result = "";
+    for (var i = 0; i < len; i++) {
+        var c = str[i];
+        if (c == "_") {
+            result = result + str[i + 1].toUpper();
+            i++;
+        } else {
+            result = result + c;
+        }
+    }
+    result.replaceAll("_", "");
+    return result.trim();
+}
+
+// string -> string
+fun lowerCamelToSnakeCase(str){
+    var len = str.length();
+    var result = "";
+    for (var i = 0; i < len; i++) {
+        var c = str[i];
+        if (c.isUpperCase()) {
+            result = result + "_" + c.toLower();
+        } else {
+            result = result + c;
+        }
+    }
+    return result.trim();
+}

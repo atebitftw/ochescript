@@ -1,0 +1,224 @@
+// Unit Testing Library
+// Author: AteBit
+// Version: 2.1
+// Description: A unit test library for the OcheScript language, inspired by Dart's test package.
+// License: MIT
+
+var _testSucceeded = 0;
+var _testFailed = 0;
+var _groupLevel = 0;
+
+// Prints a message with indentation based on the current group level.
+fun _printIndented(message) {
+  var indent = "";
+  for (var i = 0; i < _groupLevel; i = i + 1) {
+    indent = indent + "  ";
+  }
+  print(indent + message);
+}
+
+// Defines a test group.
+fun group(description, body) {
+  _printIndented("group: " + description);
+  _groupLevel = _groupLevel + 1;
+  body();
+  _groupLevel = _groupLevel - 1;
+}
+
+// Defines a test case.
+fun test(description, body) {
+  // _printIndented("test: " + description);
+  var startFailed = _testFailed;
+  
+  body();
+
+  if (_testFailed == startFailed) {
+    _testSucceeded = _testSucceeded + 1;
+     _printIndented("PASS: " + description);
+  } else {
+     _printIndented("FAIL: " + description);
+  }
+}
+
+// Asserts that [actual] matches the [matcher].
+fun expect(actual, matcher) {
+  var result = matcher.match(actual);
+  if (result != true) {
+    _testFailed = _testFailed + 1;
+    // If the matcher returned a string, it's the failure message.
+    // If it returned false, we use a generic message.
+    if (result == false) {
+       _printIndented("  Expected: " + matcher.description);
+       _printIndented("  Actual: " + actual);
+    } else {
+       _printIndented("  " + result);
+    }
+  }
+}
+
+// --- Matchers ---
+
+class Matcher {
+  init(description) {
+    this.description = description;
+  }
+  
+  match(actual) {
+    return false;
+  }
+}
+
+class EqualsMatcher extends Matcher {
+  init(expected) {
+    super.init("equals " + expected);
+    this.expected = expected;
+  }
+  
+  match(actual) {
+    if (actual == this.expected) return true;
+    return "Expected: " + this.expected + ", Actual: " + actual;
+  }
+}
+
+fun equals(expected) {
+  return EqualsMatcher(expected);
+}
+
+class IsTrueMatcher extends Matcher {
+  init() {
+    super.init("true");
+  }
+  
+  match(actual) {
+    if (actual == true) return true;
+    return "Expected: true, Actual: " + actual;
+  }
+}
+
+fun isTrue() {
+  return IsTrueMatcher();
+}
+
+class IsFalseMatcher extends Matcher {
+  init() {
+    super.init("false");
+  }
+  
+  match(actual) {
+    if (actual == false) return true;
+    return "Expected: false, Actual: " + actual;
+  }
+}
+
+fun isFalse() {
+  return IsFalseMatcher();
+}
+
+class IsNullMatcher extends Matcher {
+  init() {
+    super.init("null");
+  }
+  
+  match(actual) {
+    if (actual == null) return true;
+    return "Expected: null, Actual: " + actual;
+  }
+}
+
+fun isNull() {
+  return IsNullMatcher();
+}
+
+class IsNotNullMatcher extends Matcher {
+  init() {
+    super.init("not null");
+  }
+  
+  match(actual) {
+    if (actual != null) return true;
+    return "Expected: not null, Actual: " + actual;
+  }
+}
+
+fun isNotNull() {
+  return IsNotNullMatcher();
+}
+
+class GreaterThanMatcher extends Matcher {
+  init(value) {
+    super.init("> " + value);
+    this.value = value;
+  }
+  
+  match(actual) {
+    if (actual > this.value) return true;
+    return "Expected: > " + this.value + ", Actual: " + actual;
+  }
+}
+
+fun greaterThan(value) {
+  return GreaterThanMatcher(value);
+}
+
+class LessThanMatcher extends Matcher {
+  init(value) {
+    super.init("< " + value);
+    this.value = value;
+  }
+  
+  match(actual) {
+    if (actual < this.value) return true;
+    return "Expected: < " + this.value + ", Actual: " + actual;
+  }
+}
+
+fun lessThan(value) {
+  return LessThanMatcher(value);
+}
+
+class GreaterThanOrEqualToMatcher extends Matcher {
+  init(value) {
+    super.init(">= " + value);
+    this.value = value;
+  }
+  
+  match(actual) {
+    if (actual >= this.value) return true;
+    return "Expected: >= " + this.value + ", Actual: " + actual;
+  }
+}
+
+fun greaterThanOrEqualTo(value) {
+  return GreaterThanOrEqualToMatcher(value);
+}
+
+class LessThanOrEqualToMatcher extends Matcher {
+  init(value) {
+    super.init("<= " + value);
+    this.value = value;
+  }
+  
+  match(actual) {
+    if (actual <= this.value) return true;
+    return "Expected: <= " + this.value + ", Actual: " + actual;
+  }
+}
+
+fun lessThanOrEqualTo(value) {
+  return LessThanOrEqualToMatcher(value);
+}
+
+// Displays a summary of the tests.
+fun testSummary() {
+  print("");
+  print("Summary:");
+  print("---------------");
+  print("Succeeded: " + _testSucceeded);
+  print("Failed: " + _testFailed);
+  
+  if (_testFailed > 0) {
+    print("SOME TESTS FAILED");
+  } else {
+    print("ALL TESTS PASSED");
+  }
+}

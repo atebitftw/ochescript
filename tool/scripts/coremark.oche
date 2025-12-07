@@ -1,0 +1,280 @@
+// CoreMark-style Benchmark for OcheScript
+//
+// This is a synthetic benchmark inspired by CoreMark 1.0.
+// It measures performance in:
+// 1. List processing (find, sort, reverse)
+// 2. Matrix manipulation (multiply, add)
+// 3. State machine operation
+// 4. CRC calculation
+
+// -----------------------------------------------------------------------------
+// Global Constants & Configuration
+// -----------------------------------------------------------------------------
+var ITERATIONS = 20000; // Default iterations, can be adjusted
+var TOTAL_DATA_SIZE = 100; // Size for arrays/lists
+
+// Results:
+// 1691.  Optimized INC/DEC opcodes (was 1540).
+// 1931.  After LIST_APPEND optimization.
+// 2055.  After removing stack underflow/overflow checks.
+
+// 2340.  When script runner compiled to exe
+
+
+// -----------------------------------------------------------------------------
+// 1. List Processing
+// -----------------------------------------------------------------------------
+
+class ListEntry {
+    init(data, next) {
+        this.data = data;
+        this.next = next;
+    }
+}
+
+fun core_list_init(size, seed) {
+    var head = false;
+    var current = false;
+    
+    // Create a linked list
+    for (var i = 0; i < size; i++) {
+        // Simple pseudo-random data generation
+        var data = (i * seed) % 127; 
+        var entry = ListEntry(data, false);
+        
+        if (head == false) {
+            head = entry;
+            current = entry;
+        } else {
+            current.next = entry;
+            current = entry;
+        }
+    }
+    return head;
+}
+
+fun core_list_reverse(head) {
+    var prev = false;
+    var current = head;
+    var next = false;
+    
+    while (current != false) {
+        next = current.next;
+        current.next = prev;
+        prev = current;
+        current = next;
+    }
+    return prev;
+}
+
+fun core_list_sum(head) {
+    var sum = 0;
+    var current = head;
+    while (current != false) {
+        sum = sum + current.data;
+        current = current.next;
+    }
+    return sum;
+}
+
+// -----------------------------------------------------------------------------
+// 2. Matrix Manipulation
+// -----------------------------------------------------------------------------
+
+fun core_matrix_init(rows, cols, seed) {
+    var matrix = [];
+    for (var r = 0; r < rows; r++) {
+        var row = [];
+        for (var c = 0; c < cols; c++) {
+            var val = ((r * cols + c) * seed) % 100;
+            row.add(val);
+        }
+        matrix.add(row);
+    }
+    return matrix;
+}
+
+fun core_matrix_mul(A, B) {
+    var rowsA = A.length();
+    var colsA = A[0].length();
+    var rowsB = B.length();
+    var colsB = B[0].length();
+    
+    if (colsA != rowsB) {
+        return false; // Error: dimensions mismatch
+    }
+    
+    var C = [];
+    for (var i = 0; i < rowsA; i++) {
+        var row = [];
+        for (var j = 0; j < colsB; j++) {
+            var sum = 0;
+            for (var k = 0; k < colsA; k++) {
+                sum = sum + (A[i][k] * B[k][j]);
+            }
+            // Keep values small to avoid overflow in this synthetic test if needed
+            // But standard int is usually 64-bit or 32-bit, so it should be fine.
+            // O(n^3)
+            row.add(sum);
+        }
+        C.add(row);
+    }
+    return C;
+}
+
+fun core_matrix_sum(M) {
+    var total = 0;
+    var rows = M.length();
+    var cols = M[0].length();
+    for (var r = 0; r < rows; r++) {
+        for (var c = 0; c < cols; c++) {
+            total = total + M[r][c];
+        }
+    }
+    return total;
+}
+
+// -----------------------------------------------------------------------------
+// 3. State Machine
+// -----------------------------------------------------------------------------
+
+fun core_state_machine(input_str) {
+    var state = 0; // 0=START, 1=NUM, 2=ALPHA, 3=PUNCT
+    var count = 0;
+    var len = input_str.length();
+    
+    for (var i = 0; i < len; i++) {
+        var char_code = input_str.codeUnitAt(i);
+        
+        // Simple state transitions
+        // '0'..'9' is 48..57
+        // 'A'..'Z' is 65..90, 'a'..'z' is 97..122
+        
+        if (char_code >= 48 && char_code <= 57) {
+            switch (state) {
+                case 0: state = 1; break;
+                case 1: state = 1; break;
+                case 2: state = 0; break;
+                default: state = 1;
+            }
+        } else if ((char_code >= 65 && char_code <= 90) || (char_code >= 97 && char_code <= 122)) {
+            switch (state) {
+                case 0: state = 2; break;
+                case 1: state = 0; break;
+                case 2: state = 2; break;
+                default: state = 2;
+            }
+        } else {
+            state = 3;
+        }
+        
+        if (state == 2) {
+            count = count + 1;
+        }
+    }
+    return count;
+}
+
+// -----------------------------------------------------------------------------
+// 4. CRC Calculation (Simplified CRC-16)
+// -----------------------------------------------------------------------------
+
+fun core_crc16(data_list) {
+    var crc = 0xFFFF;
+    var len = data_list.length();
+    
+    for (var i = 0; i < len; i++) {
+        var byte = data_list[i] & 0xFF;
+        crc = crc ^ byte;
+        for (var j = 0; j < 8; j++) {
+            var odd = crc & 1;
+            crc = crc >> 1; // Logical shift right
+            if (odd != 0) {
+                crc = crc ^ 0xA001;
+            }
+        }
+    }
+    return crc;
+}
+
+// -----------------------------------------------------------------------------
+// Main Benchmark Loop
+// -----------------------------------------------------------------------------
+
+fun run_benchmark(iterations) {
+    var seed = 42;
+    var total_crc = 0;
+    
+    // Pre-allocate/Setup data
+    // List
+    var list_head = core_list_init(TOTAL_DATA_SIZE, seed);
+    
+    // Matrix (10x10)
+    var matA = core_matrix_init(10, 10, seed);
+    var matB = core_matrix_init(10, 10, seed + 1);
+    
+    // State Machine Input
+    var state_input = "A1b2C3d4E5f6G7h8I9j0!@#"; // Mixed string
+    
+    // CRC Input
+    var crc_data = [];
+    for(var k=0; k<100; k++) crc_data.add(k);
+
+    var start_time = clock();
+    
+    for (var it = 0; it < iterations; it++) {
+        // 1. List
+        var reversed = core_list_reverse(list_head);
+        var list_res = core_list_sum(reversed);
+        // Restore list for next iter (reverse back)
+        list_head = core_list_reverse(reversed);
+        
+        // 2. Matrix
+        var matC = core_matrix_mul(matA, matB);
+        var mat_res = core_matrix_sum(matC);
+        
+        // 3. State
+        var state_res = core_state_machine(state_input);
+        
+        // 4. CRC
+        var crc_res = core_crc16(crc_data);
+        
+        // Accumulate results to prevent dead code elimination (if we had an optimizer)
+        // and to verify correctness.
+        total_crc = total_crc + list_res + mat_res + state_res + crc_res;
+    }
+    
+    var end_time = clock();
+    var duration = end_time - start_time;
+    
+    return [duration, total_crc];
+}
+
+fun main() {
+    print("CoreMark-style Benchmark for OcheScript");
+    print("Iterations: $ITERATIONS");
+    print("May take up to 10 seconds to complete, or much longer depending on your environment.");
+    print("Running this benchmark in Flutter Web may take much longer.");
+    print("======================");
+    print("Running...");
+    
+    var result = run_benchmark(ITERATIONS);
+    var duration_ms = result[0];
+    var checksum = result[1];
+    
+    print("Total Time: $duration_ms ms");
+    
+    if (duration_ms > 0) {
+        var score = (ITERATIONS * 1000) / duration_ms;
+        print("Score: ${score.round()}");
+    } else {
+        print("Error: Duration too small to measure.");
+    }
+    
+    print("Checksum: $checksum");
+    
+    // Validation (Expected checksum depends on logic, printing for first run to baseline)
+    // For 1000 iterations, if logic is deterministic, checksum should be constant.
+}
+
+main();

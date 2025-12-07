@@ -1,0 +1,334 @@
+// Dhrystone Benchmark for OcheScript
+// Adapted from the classic Dhrystone 2.1 synthetic benchmark
+// Measures CPU performance through procedure calls, assignments, 
+// and control flow operations
+
+// Records;
+// 1700 with tree-walk interpreter
+// 56980 with vm bytecode interpreter.
+
+// Global varants
+var Ident_1 = 0;
+var Ident_2 = 1;
+var Ident_3 = 2;
+var Ident_4 = 3;
+var Ident_5 = 4;
+
+// Record class to simulate struct
+class Record {
+    init(ptrComp, discr, enumComp, intComp, strComp) {
+        this.ptrComp = ptrComp;
+        this.discr = discr;
+        this.enumComp = enumComp;
+        this.intComp = intComp;
+        this.strComp = strComp;
+    }
+    
+    copy() {
+        return Record(this.ptrComp, this.discr, this.enumComp, 
+                     this.intComp, this.strComp);
+    }
+}
+
+// Global variables
+var intGlob = 0;
+var boolGlob = false;
+var char1Glob = "A";
+var char2Glob = "B";
+var array1Glob = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                  0, 0, 0, 0, 0, 0, 0, 0, 0, 0]; // 50 elements
+var array2Glob = []; // Will be initialized as 50x50 array
+var ptrGlb = false;
+var ptrGlbNext = false;
+
+// Initialize 2D array
+fun initArray2Glob() {
+    for (var i = 0; i < 50; i = i + 1) {
+        var row = [];
+        for (var j = 0; j < 50; j = j + 1) {
+            row.add(0);
+        }
+        array2Glob.add(row);
+    }
+}
+
+// Procedure 0: Main benchmark loop
+fun proc0(numRuns) {
+    var startTime = clock();
+    
+    // Initialize global pointer structures
+    ptrGlb = Record(false, Ident_1, Ident_3, 40, "DHRYSTONE PROGRAM, SOME STRING");
+    ptrGlbNext = Record(false, Ident_2, Ident_1, 20, "DHRYSTONE PROGRAM, SOME STRING");
+    ptrGlb.ptrComp = ptrGlbNext;
+    
+    initArray2Glob();
+    
+    var intLoc1 = 0;
+    var intLoc2 = 0;
+    var intLoc3 = 0;
+    var charIndex = "A";
+    var enumLoc = Ident_1;
+    var strLoc1 = "DHRYSTONE PROGRAM, 1ST STRING";
+    var strLoc2 = "";
+    
+    array2Glob[8][7] = 10;
+    
+    for (var runIndex = 0; runIndex < numRuns; runIndex = runIndex + 1) {
+        proc5();
+        proc4();
+        
+        intLoc1 = 2;
+        intLoc2 = 3;
+        strLoc2 = "DHRYSTONE PROGRAM, 2ND STRING";
+        enumLoc = Ident_2;
+        boolGlob = !func2(strLoc1, strLoc2);
+        
+        while (intLoc1 < intLoc2) {
+            intLoc3 = 5 * intLoc1 - intLoc2;
+            intLoc3 = proc7(intLoc1, intLoc2);
+            intLoc1 = intLoc1 + 1;
+        }
+        
+        proc8(array1Glob, array2Glob, intLoc1, intLoc3);
+        ptrGlb = proc1(ptrGlb);
+        
+        var charIndex2 = "A";
+        while (charIndex2 != "Z") {
+            if (enumLoc == func1(charIndex2, "C")) {
+                enumLoc = proc6(Ident_1);
+                strLoc2 = "DHRYSTONE PROGRAM, 3RD STRING";
+                intLoc2 = runIndex;
+                intGlob = runIndex;
+            }
+            charIndex2 = nextChar(charIndex2);
+        }
+        
+        intLoc2 = intLoc2 * intLoc1;
+        intLoc1 = intLoc2 / intLoc3;
+        intLoc2 = 7 * (intLoc2 - intLoc3) - intLoc1;
+        intLoc1 = proc2(intLoc1);
+    }
+    
+    var endTime = clock();
+    var totalTime = endTime - startTime;
+    
+    return totalTime;
+}
+
+// Procedure 1: Record copying
+fun proc1(ptrParIn) {
+    var ptrParOut = ptrGlb.copy();
+    ptrParIn.intComp = 5;
+    ptrParOut.intComp = ptrParIn.intComp;
+    ptrParOut.ptrComp = ptrParIn.ptrComp;
+    ptrParOut.ptrComp = proc3(ptrParOut.ptrComp);
+    
+    if (ptrParOut.discr == Ident_1) {
+        ptrParOut.intComp = 6;
+        ptrParOut.enumComp = proc6(ptrParIn.enumComp);
+        ptrParOut.ptrComp = ptrGlb.ptrComp;
+        ptrParOut.intComp = proc7(ptrParOut.intComp, 10);
+    } else {
+        ptrParIn = ptrParOut.copy();
+    }
+    
+    return ptrParOut;
+}
+
+// Procedure 2: Tests on integer parameters
+fun proc2(intParIO) {
+    var intLoc = intParIO + 10;
+    var enumLoc = Ident_1;
+    
+    while (true) {
+        if (char1Glob == "A") {
+            intLoc = intLoc - 1;
+            intParIO = intLoc - intGlob;
+            enumLoc = Ident_1;
+        }
+        if (enumLoc == Ident_1) {
+            break;
+        }
+    }
+    
+    return intParIO;
+}
+
+// Procedure 3: Sets pointer parameter
+fun proc3(ptrParOut) {
+    if (ptrGlb != false) {
+        ptrParOut = ptrGlb.ptrComp;
+    }
+    
+    ptrGlb.intComp = proc7(10, intGlob);
+    return ptrParOut;
+}
+
+// Procedure 4: Tests on boolean variables
+fun proc4() {
+    var boolLoc = char1Glob == "A";
+    boolGlob = boolLoc || boolGlob;
+    char2Glob = "B";
+}
+
+// Procedure 5: Local assignments
+fun proc5() {
+    char1Glob = "A";
+    boolGlob = false;
+}
+
+// Procedure 6: Enum parameter test
+fun proc6(enumParIn) {
+    var enumParOut = enumParIn;
+    
+    if (!func3(enumParIn)) {
+        enumParOut = Ident_4;
+    }
+    
+    switch (enumParIn) {
+        case Ident_1:
+            enumParOut = Ident_1;
+            break;
+        case Ident_2:
+            if (intGlob > 100) {
+                enumParOut = Ident_1;
+            } else {
+                enumParOut = Ident_4;
+            }
+            break;
+        case Ident_3:
+            enumParOut = Ident_2;
+            break;
+        case Ident_4:
+            enumParOut = Ident_3;
+            break;
+        case Ident_5:
+            enumParOut = Ident_3;
+            break;
+    }
+    
+    return enumParOut;
+}
+
+// Procedure 7: Integer arithmetic
+fun proc7(intParI1, intParI2) {
+    var intLoc = intParI1 + 2;
+    var intParOut = intParI2 + intLoc;
+    return intParOut;
+}
+
+// Procedure 8: Array operations
+fun proc8(array1Par, array2Par, intParI1, intParI2) {
+    var intLoc = intParI1 + 5;
+    array1Par[intLoc] = intParI2;
+    array1Par[intLoc + 1] = array1Par[intLoc];
+    array1Par[intLoc + 30] = intLoc;
+    
+    for (var intIndex = intLoc; intIndex <= intLoc + 1; intIndex = intIndex + 1) {
+        array2Par[intLoc][intIndex] = intLoc;
+    }
+    
+    array2Par[intLoc][intLoc - 1] = array2Par[intLoc][intLoc - 1] + 1;
+    array2Par[intLoc + 20][intLoc] = array1Par[intLoc];
+    intGlob = 5;
+}
+
+// Function 1: Character comparison
+fun func1(charPar1, charPar2) {
+    var charLoc1 = charPar1;
+    var charLoc2 = charLoc1;
+    
+    if (charLoc2 != charPar2) {
+        return Ident_1;
+    } else {
+        return Ident_2;
+    }
+}
+
+// Function 2: String comparison
+fun func2(strParI1, strParI2) {
+    var intLoc = 1;
+    var charLoc = "A";
+    
+    // Bounds checking for string access
+    var len1 = strParI1.length();
+    var len2 = strParI2.length();
+    
+    while (intLoc <= 1) {
+        if (intLoc < len1 && (intLoc + 1) < len2) {
+            if (func1(strParI1[intLoc], strParI2[intLoc + 1]) == Ident_1) {
+                charLoc = "A";
+                intLoc = intLoc + 1;
+            } else {
+                break;
+            }
+        } else {
+            break;
+        }
+    }
+    
+    if (charLoc == "W" || charLoc == "X" || charLoc == "Y" || charLoc == "Z") {
+        intLoc = 7;
+    }
+    
+    if (charLoc == "X") {
+        return true;
+    } else {
+        if (strParI1 != strParI2) {
+            intLoc = intLoc + 7;
+            return true;
+        } else {
+            return false;
+        }
+    }
+}
+
+// Function 3: Enum parameter test
+fun func3(enumParIn) {
+    var enumLoc = enumParIn;
+    
+    if (enumLoc == Ident_3) {
+        return true;
+    }
+    
+    return false;
+}
+
+// Helper: Get next character
+fun nextChar(ch) {
+    switch (ch) {
+        case "A": return "B";
+        case "B": return "C";
+        case "C": return "D";
+        case "D": return "E";
+        case "E": return "F";
+        default: return "Z";
+    }
+}
+
+// Main entry point
+fun main() {
+    var numRuns = 120000;
+    
+    print("Dhrystone Benchmark for oche_script");
+    print("====================================");
+    print("Execution starts");
+    print("Number of runs: $numRuns. Starting...");
+    var elapsedMs = proc0(numRuns);
+    print("...Finished.");
+    print("====================================");
+    print("Total elapsed time: $elapsedMs ms");
+    
+    if (elapsedMs > 0) {
+        var runsPerSecond = (numRuns * 1000) / elapsedMs;
+        var dhryPerSecond = runsPerSecond;
+        
+        print("Runs per second: ${runsPerSecond.round()}");
+        print("Dhrystones per second: ${dhryPerSecond.round()}");
+    } else {
+        print("Elapsed time too small to measure accurately");
+    }
+}
+
+main();

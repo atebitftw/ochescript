@@ -1,0 +1,16 @@
+// Example library script that can be included in other scripts.
+
+
+class Dice {
+    rollD6() {
+        return rndInt(6) + 1;
+    }
+
+    rollD8() {
+        return rndInt(8) + 1;
+    }
+
+    rollD20() {
+        return rndInt(20) + 1;
+    }
+}

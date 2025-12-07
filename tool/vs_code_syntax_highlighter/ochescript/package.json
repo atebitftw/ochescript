@@ -1,0 +1,43 @@
+{
+  "name": "ochescript",
+  "displayName": "OcheScript",
+  "description": "Syntax highlighter for OcheScript",
+  "version": "0.0.1",
+  "publisher": "atebitftw",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/atebitftw/oche_script.git"
+  },
+  "engines": {
+    "vscode": "^1.100.0"
+  },
+  "activationEvents": [
+    "onLanguage:ochescript"
+  ],
+  "categories": [
+    "Programming Languages"
+  ],
+  "main": "./extension.js",
+  "contributes": {
+    "languages": [
+      {
+        "id": "ochescript",
+        "aliases": [
+          "OcheScript",
+          "ochescript"
+        ],
+        "extensions": [
+          ".oche"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "ochescript",
+        "scopeName": "source.ochescript",
+        "path": "./syntaxes/ochescript.tmLanguage.json"
+      }
+    ]
+  }
+}

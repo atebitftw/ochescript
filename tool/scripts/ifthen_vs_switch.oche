@@ -1,0 +1,169 @@
+// Benchmark comparing if/else if vs switch/case
+// Tests both integer and wrapped logic scenarios to evaluate performance differences.
+
+fun testIntIf(val) {
+    if (val == 0) return 100;
+    else if (val == 1) return 101;
+    else if (val == 2) return 102;
+    else if (val == 3) return 103;
+    else if (val == 4) return 104;
+    else if (val == 5) return 105;
+    else if (val == 6) return 106;
+    else if (val == 7) return 107;
+    else if (val == 8) return 108;
+    else if (val == 9) return 109;
+    else if (val == 10) return 110;
+    return -1;
+}
+
+fun testIntSwitch(val) {
+    switch (val) {
+        case 0: return 100;
+        case 1: return 101;
+        case 2: return 102;
+        case 3: return 103;
+        case 4: return 104;
+        case 5: return 105;
+        case 6: return 106;
+        case 7: return 107;
+        case 8: return 108;
+        case 9: return 109;
+        case 10: return 110;
+        default: return -1;
+    }
+}
+
+fun testComplexCalculationIf(val, m) {
+    var res = 0;
+    if (val == 0) {
+        res = (m * 2) + 1;
+    } else if (val == 1) {
+        res = (m * 3) + 2;
+    } else if (val == 2) {
+        res = (m * 4) + 3;
+    } else if (val == 3) {
+        res = (m * 5) + 4;
+    } else if (val == 4) {
+        res = (m * 6) + 5;
+    } else if (val == 5) {
+        res = (m * 7) + 6;
+    } else {
+        res = m;
+    }
+    return res;
+}
+
+fun testComplexCalculationSwitch(val, m) {
+    var res = 0;
+    switch (val) {
+        case 0: 
+            res = (m * 2) + 1;
+            break;
+        case 1: 
+            res = (m * 3) + 2;
+            break;
+        case 2: 
+            res = (m * 4) + 3;
+            break;
+        case 3: 
+            res = (m * 5) + 4;
+            break;
+        case 4: 
+            res = (m * 6) + 5;
+            break;
+        case 5: 
+            res = (m * 7) + 6;
+            break;
+        default: 
+            res = m;
+    }
+    return res;
+}
+
+// Data for sparse/string tests
+fun testStringIf(val) {
+    if (val == "apple") return 1;
+    else if (val == "banana") return 2;
+    else if (val == "cherry") return 3;
+    else if (val == "date") return 4;
+    else if (val == "elderberry") return 5;
+    else if (val == "fig") return 6;
+    return 0;
+}
+
+fun testStringSwitch(val) {
+    switch (val) {
+        case "apple": return 1;
+        case "banana": return 2;
+        case "cherry": return 3;
+        case "date": return 4;
+        case "elderberry": return 5;
+        case "fig": return 6;
+        default: return 0;
+    }
+}
+
+fun main() {
+    print("Starting If/Then vs Switch Benchmark...");
+    // 500,000 iterations
+    var iterations = 5000000;
+    
+    // --- Test 1: Simple Integer Return ---
+    print("Test 1: Simple Integer Mapping ($iterations iterations)");
+    
+    var start = clock();
+    for (var i = 0; i < iterations; i = i + 1) {
+        testIntIf(i % 12);
+    }
+    var durIf = clock() - start;
+    print("If/Else Time: ${durIf} ms");
+
+    start = clock();
+    for (var i = 0; i < iterations; i = i + 1) {
+        testIntSwitch(i % 12);
+    }
+    var durSwitch = clock() - start;
+    print("Switch Time:  ${durSwitch} ms");
+    print("Diff Int: ${durIf - durSwitch} ms");
+
+    // --- Test 2: Complex Calculation with side effects ---
+    print("\nTest 2: Complex Calculation ($iterations iterations)");
+    
+    start = clock();
+    var sumIf = 0;
+    for (var i = 0; i < iterations; i = i + 1) {
+        sumIf = sumIf + testComplexCalculationIf(i % 7, i);
+    }
+    durIf = clock() - start;
+    print("If/Else Time: ${durIf} ms");
+
+    start = clock();
+    var sumSwitch = 0;
+    for (var i = 0; i < iterations; i = i + 1) {
+        sumSwitch = sumSwitch + testComplexCalculationSwitch(i % 7, i);
+    }
+    durSwitch = clock() - start;
+    print("Switch Time:  ${durSwitch} ms");
+    print("Diff Complex: ${durIf - durSwitch} ms");
+
+    // --- Test 3: String Comparison ---
+    print("\nTest 3: String Comparison ($iterations iterations)");
+    var strings = ["apple", "banana", "cherry", "date", "elderberry", "fig", "grape"];
+    
+    start = clock();
+    for (var i = 0; i < iterations; i = i + 1) {
+        testStringIf(strings[i % 7]);
+    }
+    durIf = clock() - start;
+    print("If/Else Time: ${durIf} ms");
+
+    start = clock();
+    for (var i = 0; i < iterations; i = i + 1) {
+        testStringSwitch(strings[i % 7]);
+    }
+    durSwitch = clock() - start;
+    print("Switch Time:  ${durSwitch} ms");
+    print("Diff String: ${durIf - durSwitch} ms");
+}
+
+main();

@@ -1,0 +1,67 @@
+// Test file for syntax highlighting
+// Keywords
+if (true) {
+    print("True");
+} else {
+    print("False");
+}
+
+while (false) {
+    break;
+}
+
+for (var i = 0; i < 10; i++) {
+    continue;
+}
+
+var x = 1;
+switch (x) {
+    case 1:
+        out("One");
+    default:
+        out("Other");
+}
+
+// Classes and Functions
+class TestClass extends BaseClass {
+    init() {
+        super.init();
+        this.field = "value";
+    }
+
+    method(arg) {
+        return arg;
+    }
+}
+
+// Types
+var n = Num;
+var b = Bool;
+var l = List;
+var m = Map;
+var d = Date;
+var dur = Duration;
+var s = String;
+
+// Async/Await
+async fun asyncOp() {
+    await otherOp();
+}
+
+// Operators
+var a = 1 + 2 * 3 / 4 % 5;
+var b = a << 1 >> 1 & 1 | 1 ^ 1 ~1;
+var c = true && false || !true;
+var d = 1 == 1 != 2 <= 3 >= 4 < 5 > 6;
+var e = 1;
+e++;
+e--;
+
+// String Interpolation
+var name = "World";
+print("Hello $name");
+print("Calc: ${1 + 2}");
+print("Escaped: \" \n \t \\ \$");
+
+// Include
+include other;
