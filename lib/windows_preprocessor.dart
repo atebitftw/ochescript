@@ -10,7 +10,7 @@ class WindowsPlatformPreProcessor extends IncludesPreprocesser {
 
   /// Returns a list of files to be included in the compilation process.
   @override
-  Map<String, String> getLibraries(String source) {
+  Future<Map<String, String>> getLibraries(String source) async {
     final libraries = getLibraryNamesToInclude(source);
     // using map ensures that duplicate library dependencies are resolved only once.
     final processed = <String, String>{};
@@ -24,7 +24,7 @@ class WindowsPlatformPreProcessor extends IncludesPreprocesser {
       if (librarySourceCode.isNotEmpty) {
         processed[libraryName] = librarySourceCode;
         // recursively process the library dependencies.
-        processed.addAll(getLibraries(librarySourceCode));
+        processed.addAll(await getLibraries(librarySourceCode));
       }
     }
 

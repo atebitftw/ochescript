@@ -11,7 +11,7 @@ abstract class IncludesPreprocesser {
   /// Returns a map of files to be included in the compilation process.
   ///
   /// The key is the library name and the value is the source code of the library.
-  Map<String, String> getLibraries(String source);
+  Future<Map<String, String>> getLibraries(String source);
 
   /// A helper method that parses the source code and returns a list of library names to include.
   /// This method should not be overridden.

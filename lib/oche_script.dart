@@ -81,7 +81,7 @@ Future<Map<String, Object>> _run(
   String sourceWithIncludes = source;
 
   if (preprocesser != null) {
-    final libraries = preprocesser.getLibraries(source);
+    final libraries = await preprocesser.getLibraries(source);
     final processedLibraries = libraries.entries.map((entry) {
       return "// #source ${entry.key}\n${entry.value}\n// #end_source ${entry.key}";
     });

@@ -12,11 +12,11 @@ import 'package:oche_script/src/compiler/compiler.dart';
 
 class TestPreprocesser extends IncludesPreprocesser {
   @override
-  Map<String, String> getLibraries(String source) {
+  Future<Map<String, String>> getLibraries(String source) async {
     // In a real scenario, this would read files.
     // Here we mock the file content.
     if (source.contains('include "helper"')) {
-      return {"helper": 'var helperVar = "helperValue";'};
+      return Future.value({"helper": 'var helperVar = "helperValue";'});
     }
     return {};
   }

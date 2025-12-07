@@ -3,7 +3,7 @@ import 'package:oche_script/oche_script.dart';
 
 class MockPreprocesser extends IncludesPreprocesser {
   @override
-  Map<String, String> getLibraries(String source) {
+  Future<Map<String, String>> getLibraries(String source) async {
     return {};
   }
 }
