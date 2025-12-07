@@ -1,7 +1,5 @@
 // Models Library
 // This library provides some utility to work with a model system.
-// (see https://github.com/atebitftw/dart-common/tree/main/bin)
-
 
 var registeredModels = {};
 
