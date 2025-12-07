@@ -72,7 +72,11 @@
           throw RuntimeError(&quot;RemoveWhere function must be a function.&quot;);
         }
         for (int i = target.length - 1; i &gt;= 0; i--) {
-          bool remove = await invokeScriptClosure(interpreter, arguments[0], [target[i]]) as bool;
+          bool remove =
+              await invokeScriptClosure(interpreter, arguments[0], [
+                    target[i],
+                  ])
+                  as bool;
           if (remove) {
             target.removeAt(i);
           }
@@ -107,7 +111,7 @@
 <footer>
   <span class="no-break">
     oche_script
-      1.0.4
+      1.0.5
   </span>
   
 </footer>

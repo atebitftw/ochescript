@@ -81,7 +81,9 @@ print("JSON: $json");
   <pre class="language-dart"><code class="language-dart">Map&lt;String, dynamic&gt; jsonDecode(List args) {
   _arityCheck(1, args.length);
   if (args[0] is! String) {
-    throw RuntimeError(&quot;jsonDecode: Expected a string, but got ${args[0].runtimeType}&quot;);
+    throw RuntimeError(
+      &quot;jsonDecode: Expected a string, but got ${args[0].runtimeType}&quot;,
+    );
   }
 
   return json.jsonDecode(
@@ -125,7 +127,7 @@ print("JSON: $json");
 <footer>
   <span class="no-break">
     oche_script
-      1.0.4
+      1.0.5
   </span>
   
 </footer>

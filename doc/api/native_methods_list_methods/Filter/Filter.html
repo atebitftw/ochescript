@@ -73,7 +73,8 @@
         }
         var result = &lt;Object&gt;[];
         for (var element in target) {
-          bool keep = await invokeScriptClosure(vm, arguments[0], [element]) as bool;
+          bool keep =
+              await invokeScriptClosure(vm, arguments[0], [element]) as bool;
           if (keep) result.add(element);
         }
         return result;
@@ -106,7 +107,7 @@
 <footer>
   <span class="no-break">
     oche_script
-      1.0.4
+      1.0.5
   </span>
   
 </footer>

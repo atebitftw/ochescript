@@ -69,7 +69,9 @@
       arity: 1,
       function: (target, vm, arguments) async {
         if (arguments[0] is! ObjClosure) {
-          throw RuntimeError(&quot;Map function must be a function. ${arguments[0].runtimeType}&quot;);
+          throw RuntimeError(
+            &quot;Map function must be a function. ${arguments[0].runtimeType}&quot;,
+          );
         }
         var result = [];
         for (var element in target) {
@@ -105,7 +107,7 @@
 <footer>
   <span class="no-break">
     oche_script
-      1.0.4
+      1.0.5
   </span>
   
 </footer>

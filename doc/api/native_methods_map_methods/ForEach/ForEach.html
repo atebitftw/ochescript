@@ -69,10 +69,15 @@
       arity: 1,
       function: (target, vm, arguments) async {
         if (arguments[0] is! ObjClosure) {
-          throw RuntimeError(&quot;forEach arg must be a function: (key, value) {...}&quot;);
+          throw RuntimeError(
+            &quot;forEach arg must be a function: (key, value) {...}&quot;,
+          );
         }
         for (final entry in target.entries) {
-          await invokeScriptClosure(vm, arguments[0], [entry.key, entry.value]);
+          await invokeScriptClosure(vm, arguments[0], [
+            entry.key,
+            entry.value,
+          ]);
         }
         return target.length;
       },
@@ -104,7 +109,7 @@
 <footer>
   <span class="no-break">
     oche_script
-      1.0.4
+      1.0.5
   </span>
   
 </footer>

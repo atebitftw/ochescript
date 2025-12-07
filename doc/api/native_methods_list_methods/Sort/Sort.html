@@ -69,12 +69,19 @@
       arity: 1,
       function: (target, vm, arguments) async {
         if (arguments[0] is! ObjClosure) {
-          throw RuntimeError(&quot;Sort function must be a function (a, b) =&gt; int.&quot;);
+          throw RuntimeError(
+            &quot;Sort function must be a function (a, b) =&gt; int.&quot;,
+          );
         }
         &#47;&#47; Bubble sort for simplicity and async support
         for (int i = 0; i &lt; target.length - 1; i++) {
           for (int j = 0; j &lt; target.length - i - 1; j++) {
-            int comparison = await invokeScriptClosure(vm, arguments[0], [target[j], target[j + 1]]) as int;
+            int comparison =
+                await invokeScriptClosure(vm, arguments[0], [
+                      target[j],
+                      target[j + 1],
+                    ])
+                    as int;
             if (comparison &gt; 0) {
               var temp = target[j];
               target[j] = target[j + 1];
@@ -112,7 +119,7 @@
 <footer>
   <span class="no-break">
     oche_script
-      1.0.4
+      1.0.5
   </span>
   
 </footer>

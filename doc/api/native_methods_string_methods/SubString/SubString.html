@@ -75,12 +75,19 @@
           throw RuntimeError(&quot;substring() takes two integers as arguments.&quot;);
         }
 
-        if (from &lt; 0 || to &lt; 0 || from &gt; target.length || to &gt; target.length) {
-          throw RuntimeError(&quot;substring() arguments must be between 0 and the length of the string.&quot;);
+        if (from &lt; 0 ||
+            to &lt; 0 ||
+            from &gt; target.length ||
+            to &gt; target.length) {
+          throw RuntimeError(
+            &quot;substring() arguments must be between 0 and the length of the string.&quot;,
+          );
         }
 
         if (from &gt; to) {
-          throw RuntimeError(&quot;substring() arguments must be in the order from, to.&quot;);
+          throw RuntimeError(
+            &quot;substring() arguments must be in the order from, to.&quot;,
+          );
         }
 
         return target.substring(from, to);
@@ -113,7 +120,7 @@
 <footer>
   <span class="no-break">
     oche_script
-      1.0.4
+      1.0.5
   </span>
   
 </footer>
