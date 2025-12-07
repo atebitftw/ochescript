@@ -3,7 +3,7 @@ import 'package:oche_script/src/runtime/closure_invoker.dart' show invokeScriptC
 
 /// Registers all list extensions.
 /// This is called automatically by the VM.
-registerListExtensions() {
+void registerListExtensions() {
   registerNativeMethod(ToString());
   registerNativeMethod(Head());
   registerNativeMethod(Tail());

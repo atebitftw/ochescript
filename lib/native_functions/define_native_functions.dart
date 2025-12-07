@@ -290,7 +290,7 @@ void _arityCheck(int expected, int actual) {
   if (expected != actual) throw RuntimeError("Arity mismatch. Expected $expected, got $actual.");
 }
 
-void _stringTypeCheck(arg) {
+void _stringTypeCheck(Object arg) {
   if (arg is! String) {
     throw RuntimeError("Argument must be a string. Got $arg.");
   }
