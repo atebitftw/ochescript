@@ -6,7 +6,7 @@
 build/
 pubspec.lock
 
-doc/api/
+# doc/api/
 
 .env*
 
