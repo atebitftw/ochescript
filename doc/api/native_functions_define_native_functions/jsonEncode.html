@@ -4,8 +4,8 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1, user-scalable=no">
-  <meta name="description" content="API docs for the jsonEncode property from the define_native_functions library, for the Dart programming language.">
-  <title>jsonEncode property - define_native_functions library - Dart API</title>
+  <meta name="description" content="API docs for the jsonEncode function from the define_native_functions library, for the Dart programming language.">
+  <title>jsonEncode function - define_native_functions library - Dart API</title>
 
 
   
@@ -26,7 +26,7 @@
   <ol class="breadcrumbs gt-separated dark hidden-xs">
     <li><a href="../index.html">oche_script</a></li>
     <li><a href="../native_functions_define_native_functions/">native_functions\define_native_functions.dart</a></li>
-    <li class="self-crumb">jsonEncode property</li>
+    <li class="self-crumb">jsonEncode function</li>
   </ol>
   <div class="self-name">jsonEncode</div>
   <form class="search navbar-right" role="search">
@@ -48,18 +48,20 @@
       data-above-sidebar="native_functions_define_native_functions&#47;native_functions_define_native_functions-library-sidebar.html"
       data-below-sidebar="">
       <div>
-<h1><span class="kind-top-level-property">jsonEncode</span> top-level property 
+<h1><span class="kind-function">jsonEncode</span> function 
  
 </h1></div>
 
-        <section class="multi-line-signature">
-          
-          <a href="https://api.dart.dev/stable/3.10.3/dart-core/Function-class.html">Function</a>
-          <span class="name ">jsonEncode</span>
-          <div class="features"><span class="feature">final</span></div>
-
-        </section>
+    <section class="multi-line-signature">
         
+<span class="returntype"><a href="https://api.dart.dev/stable/3.10.3/dart-core/String-class.html">String</a></span>
+<span class="name ">jsonEncode</span>(<wbr><ol class="parameter-list single-line"> <li><span class="parameter" id="jsonEncode-param-args"><span class="type-annotation"><a href="https://api.dart.dev/stable/3.10.3/dart-core/List-class.html">List</a></span> <span class="parameter-name">args</span></span></li>
+</ol>)
+
+        
+
+    </section>
+    
 <section class="desc markdown">
   <p>Provides a jsonEncode() function that encodes a map object to a JSON string.
 Supports conversion of DateTime objects to strings.</p>
@@ -72,17 +74,17 @@ print("JSON: $json");
 </code></pre>
 </section>
 
-        
+
+    
 <section class="summary source-code" id="source">
   <h2><span>Implementation</span></h2>
-  <pre class="language-dart"><code class="language-dart">final Function jsonEncode = (args) {
+  <pre class="language-dart"><code class="language-dart">String jsonEncode(List args) {
   if (args[0] is! Map) {
     throw RuntimeError(&quot;jsonEncode: Expected a map object, but got ${args[0].runtimeType}&quot;);
   }
 
   _arityCheck(1, args.length);
-
-  return JSON.jsonEncode(
+  return json.jsonEncode(
     args[0],
     toEncodable: (object) {
       if (object is DateTime) {
@@ -91,9 +93,8 @@ print("JSON: $json");
       return object;
     },
   );
-};</code></pre>
+}</code></pre>
 </section>
-
 
 
   </div> <!-- /.main-content -->
@@ -107,7 +108,7 @@ print("JSON: $json");
 <ol class="breadcrumbs gt-separated dark hidden-l" id="sidebar-nav">
     <li><a href="../index.html">oche_script</a></li>
     <li><a href="../native_functions_define_native_functions/">define_native_functions</a></li>
-    <li class="self-crumb">jsonEncode property</li>
+    <li class="self-crumb">jsonEncode function</li>
 </ol>
 
     <h5>define_native_functions library</h5>
@@ -119,7 +120,7 @@ print("JSON: $json");
 <footer>
   <span class="no-break">
     oche_script
-      1.0.3
+      1.0.4
   </span>
   
 </footer>
