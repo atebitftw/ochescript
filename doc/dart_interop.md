@@ -49,7 +49,7 @@ var n = clock();
 print(n); // milliseconds elapsed since epoch.
 ```
 
-See [Native Functions](native_functions.md) for more information.
+See [Native Functions](https://github.com/atebitftw/ochescript/blob/main/doc/native_functions.md) for more information.
 
 ### Native Methods
 Native methods are akin to Dart extension methods, except that they are registered ahead of time to the vm.  These methods are always bound to a supported type, and are called on that type via dot notation.
@@ -63,7 +63,7 @@ print(n.abs());
 
 .abs() is a native method implemented in Dart and registered with OcheScript at compile time.  There are a bunch of these, but you can extend them by following the instructions in the API or in this document.
 
-See [Native Methods](native_methods.md) for more information.
+See [Native Methods](https://github.com/atebitftw/ochescript/blob/main/doc/native_methods.md) for more information.
 
 ## Runtime Interop
 *"Runtime"* refers to the script runtime phase, not the Dart runtime phase.

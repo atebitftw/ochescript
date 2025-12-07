@@ -64,7 +64,7 @@ You will have to load it manually.  In the extensions sidebar, load the vsix fil
 Now any script files with the `.oche` extension will be syntax highlighted.
 
 ## More Resources
-*   [Dart Interop](dart_interop.md)
-*   [Native Functions](native_functions.md)
-*   [Native Methods](native_methods.md)
-*   [Language Specification](language_specification.md)
+*   [Dart Interop](https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md)
+*   [Native Functions](https://github.com/atebitftw/ochescript/blob/main/doc/native_functions.md)
+*   [Native Methods](https://github.com/atebitftw/ochescript/blob/main/doc/native_methods.md)
+*   [Language Specification](https://github.com/atebitftw/ochescript/blob/main/doc/language_specification.md)

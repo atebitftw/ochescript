@@ -669,7 +669,7 @@ The `#include` directive allows you to split your code into multiple files.  Thi
 
 Using include directives is a compile-time preprocessor operation, and is platform specific.  OcheScript provides an interface for writing your own preprocessor based on your platform.  For example on Windows, a preprocessor might use `dart:io` to find include files in the current directory and the /include sub-directory.  A Flutter implementation might look for include files in the flutter assets bundle.
 
-See [Windows Example](../lib/windows_preprocessor.dart).
+See [Windows Example](http://github.com/atebitftw/ochescript/blob/main/lib/windows_preprocessor.dart).
 
 ## Native Methods (Compile-Time Capability)
 Think of these as compile-time extension methods on supported types.
@@ -682,7 +682,7 @@ print(x.abs()); // 10
 
 The vm provides the capability to register additional native methods at compile time.
 
-See the [Native Methods](native_methods.md) document for more information.
+See the [Native Methods](https://github.com/atebitftw/ochescript/blob/main/doc/native_methods.md) document for more information.
 
 ## Native Functions
 These are standalone global functions that can be called from any script.
@@ -693,7 +693,7 @@ await wait(1000); // Waits for 1 second
 
 The vm provides the capability to register additional native functions at compile time.
 
-See the [Native Functions](native_functions.md) document for more information.
+See the [Native Functions](https://github.com/atebitftw/ochescript/blob/main/doc/native_functions.md) document for more information.
 
 ## The `out` Statement
 The `out` statement is used to export values from the script to the host application's state. It is similar to `print`, but instead of writing to stdout, it writes to a keyed output map.

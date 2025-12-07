@@ -24,16 +24,16 @@ I work on some very large-scale Flutter projects that sometimes require a bit of
 *Side Note: Dart technically does have arbitrary code execution capability via `dart:mirrors`, but I personally do not consider it to be a viable approach for many production application scenarios, especially anything Flutter-based (mirrors disallowed).  Another reason to avoid mirrors: As soon as you bring in mirrors, you lose tree-shaking.*
 
 ## Getting Started
-See the [Getting Started](lib/doc/getting_started.md) document for more information.
+See the [Getting Started](https://github.com/atebitftw/ochescript/blob/main/doc/getting_started.md) document for more information.
 
 ## Language Specification
-See the [Language Specification](lib/doc/language_specification.md) document for more information.
+See the [Language Specification](https://github.com/atebitftw/ochescript/blob/main/doc/language_specification.md) document for more information.
 
 ## Library API
-See the [API](lib/doc/api) document for more information.  This is an HTML document generated from the Dartdoc comments in the source code.
+See the [API](https://github.com/atebitftw/ochescript/tree/main/doc/api) document for more information.  This is an HTML document generated from the Dartdoc comments in the source code.
 
 ## Dart Interop
-See the [Dart Interop](lib/doc/dart_interop.md) document for more information.
+See the [Dart Interop](https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md) document for more information.
 
 ## Error Handling
 Runtime errors cause script execution to halt with an error message.
