@@ -9,5 +9,6 @@ class Token {
   Token(this.type, this.lexeme, this.line, {this.literal});
 
   @override
-  String toString() => "($type, Lexeme: $lexeme, Literal: $literal, line: $line)";
+  String toString() =>
+      "($type, Lexeme: $lexeme, Literal: $literal, line: $line)";
 }

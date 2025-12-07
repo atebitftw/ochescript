@@ -1,5 +1,6 @@
 import 'package:oche_script/oche_script.dart';
-import 'package:oche_script/src/runtime/closure_invoker.dart' show invokeScriptClosure;
+import 'package:oche_script/src/runtime/closure_invoker.dart'
+    show invokeScriptClosure;
 
 /// Registers all list extensions.
 /// This is called automatically by the VM.
@@ -118,12 +119,19 @@ class Sort extends NativeMethodDefinition<List<Object>, int> {
         arity: 1,
         function: (target, vm, arguments) async {
           if (arguments[0] is! ObjClosure) {
-            throw RuntimeError("Sort function must be a function (a, b) => int.");
+            throw RuntimeError(
+              "Sort function must be a function (a, b) => int.",
+            );
           }
           // Bubble sort for simplicity and async support
           for (int i = 0; i < target.length - 1; i++) {
             for (int j = 0; j < target.length - i - 1; j++) {
-              int comparison = await invokeScriptClosure(vm, arguments[0], [target[j], target[j + 1]]) as int;
+              int comparison =
+                  await invokeScriptClosure(vm, arguments[0], [
+                        target[j],
+                        target[j + 1],
+                      ])
+                      as int;
               if (comparison > 0) {
                 var temp = target[j];
                 target[j] = target[j + 1];
@@ -172,7 +180,11 @@ class RemoveWhere extends NativeMethodDefinition<List<Object>, int> {
             throw RuntimeError("RemoveWhere function must be a function.");
           }
           for (int i = target.length - 1; i >= 0; i--) {
-            bool remove = await invokeScriptClosure(interpreter, arguments[0], [target[i]]) as bool;
+            bool remove =
+                await invokeScriptClosure(interpreter, arguments[0], [
+                      target[i],
+                    ])
+                    as bool;
             if (remove) {
               target.removeAt(i);
             }
@@ -264,7 +276,8 @@ class Every extends NativeMethodDefinition<List<Object>, bool> {
             throw RuntimeError("Every function must be a function.");
           }
           for (var element in target) {
-            bool result = await invokeScriptClosure(vm, arguments[0], [element]) as bool;
+            bool result =
+                await invokeScriptClosure(vm, arguments[0], [element]) as bool;
             if (!result) return false;
           }
           return true;
@@ -289,7 +302,8 @@ class Any extends NativeMethodDefinition<List<Object>, bool> {
             throw RuntimeError("Any function must be a function.");
           }
           for (var element in target) {
-            bool result = await invokeScriptClosure(vm, arguments[0], [element]) as bool;
+            bool result =
+                await invokeScriptClosure(vm, arguments[0], [element]) as bool;
             if (result) return true;
           }
           return false;
@@ -315,7 +329,8 @@ class Filter extends NativeMethodDefinition<List<Object>, List<Object>> {
           }
           var result = <Object>[];
           for (var element in target) {
-            bool keep = await invokeScriptClosure(vm, arguments[0], [element]) as bool;
+            bool keep =
+                await invokeScriptClosure(vm, arguments[0], [element]) as bool;
             if (keep) result.add(element);
           }
           return result;
@@ -337,7 +352,9 @@ class Map extends NativeMethodDefinition<List<Object>, List> {
         arity: 1,
         function: (target, vm, arguments) async {
           if (arguments[0] is! ObjClosure) {
-            throw RuntimeError("Map function must be a function. ${arguments[0].runtimeType}");
+            throw RuntimeError(
+              "Map function must be a function. ${arguments[0].runtimeType}",
+            );
           }
           var result = [];
           for (var element in target) {

@@ -43,7 +43,10 @@ class VM {
   /// Register a callback for output.  Only one callback can be registered at a time.
   void registerOutCallback(Function(String, dynamic) callback) {
     if (_isRunning) {
-      throw reportRuntimeError(getCurrentLine(), "Cannot register output callback while VM is running.");
+      throw reportRuntimeError(
+        getCurrentLine(),
+        "Cannot register output callback while VM is running.",
+      );
     }
     _outCallback = callback;
   }
@@ -51,21 +54,32 @@ class VM {
   /// Defines a native function in the global scope.
   void defineNative(String name, Function function) {
     if (_isRunning) {
-      throw reportRuntimeError(getCurrentLine(), "Cannot define native function while VM is running.");
+      throw reportRuntimeError(
+        getCurrentLine(),
+        "Cannot define native function while VM is running.",
+      );
     }
     if (_globals.containsKey(name)) {
-      Common.log.info("${getCurrentLine()}: Native function '$name' already defined.");
+      Common.log.info(
+        "${getCurrentLine()}: Native function '$name' already defined.",
+      );
     }
     _globals[name] = ObjNative(name, function);
   }
 
   void defineGlobal(String name, Object? value, {bool override = false}) {
     if (_isRunning) {
-      throw reportRuntimeError(getCurrentLine(), "Cannot define global variable while VM is running.");
+      throw reportRuntimeError(
+        getCurrentLine(),
+        "Cannot define global variable while VM is running.",
+      );
     }
 
     if (!override && _globals.containsKey(name)) {
-      throw reportRuntimeError(getCurrentLine(), "Global variable '$name' already defined.");
+      throw reportRuntimeError(
+        getCurrentLine(),
+        "Global variable '$name' already defined.",
+      );
     }
     _globals[name] = value;
   }
@@ -181,7 +195,10 @@ class VM {
           if (val is num) {
             _stack[frame.slots + slot] = val + 1;
           } else {
-            throw reportRuntimeError(getCurrentLine(), "Operand must be a number.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Operand must be a number.",
+            );
           }
           break;
 
@@ -191,7 +208,10 @@ class VM {
           if (val is num) {
             _stack[frame.slots + slot] = val - 1;
           } else {
-            throw reportRuntimeError(getCurrentLine(), "Operand must be a number.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Operand must be a number.",
+            );
           }
           break;
 
@@ -199,7 +219,10 @@ class VM {
           final nameIndex = frame.chunk.code[frame.ip++];
           final name = frame.chunk.constants[nameIndex] as String;
           if (!_globals.containsKey(name)) {
-            throw reportRuntimeError(getCurrentLine(), "Undefined variable '$name'.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Undefined variable '$name'.",
+            );
           }
           push(_globals[name]);
           break;
@@ -214,7 +237,10 @@ class VM {
           final nameIndex = frame.chunk.code[frame.ip++];
           final name = frame.chunk.constants[nameIndex] as String;
           if (!_globals.containsKey(name)) {
-            throw reportRuntimeError(getCurrentLine(), "Undefined variable '$name'.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Undefined variable '$name'.",
+            );
           }
           _globals[name] = peek(0);
           break;
@@ -284,7 +310,10 @@ class VM {
             a.addAll(b);
             push(a);
           } else {
-            throw reportRuntimeError(getCurrentLine(), "ADD: Invalid operands: (${a.runtimeType}, ${b.runtimeType})");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "ADD: Invalid operands: (${a.runtimeType}, ${b.runtimeType})",
+            );
           }
           break;
 
@@ -353,13 +382,17 @@ class VM {
           break;
 
         case OpCode.jumpOp:
-          final offset = (frame.chunk.code[frame.ip] << 8) | frame.chunk.code[frame.ip + 1];
+          final offset =
+              (frame.chunk.code[frame.ip] << 8) |
+              frame.chunk.code[frame.ip + 1];
           frame.ip += 2;
           frame.ip += offset;
           break;
 
         case OpCode.jumpIfFalse:
-          final offset = (frame.chunk.code[frame.ip] << 8) | frame.chunk.code[frame.ip + 1];
+          final offset =
+              (frame.chunk.code[frame.ip] << 8) |
+              frame.chunk.code[frame.ip + 1];
           frame.ip += 2;
           if (_isFalsey(peek(0))) {
             frame.ip += offset;
@@ -367,7 +400,9 @@ class VM {
           break;
 
         case OpCode.loop:
-          final offset = (frame.chunk.code[frame.ip] << 8) | frame.chunk.code[frame.ip + 1];
+          final offset =
+              (frame.chunk.code[frame.ip] << 8) |
+              frame.chunk.code[frame.ip + 1];
           frame.ip += 2;
           frame.ip -= offset;
           break;
@@ -379,14 +414,16 @@ class VM {
           break;
 
         case OpCode.invoke:
-          final method = frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
+          final method =
+              frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
           final argCount = frame.chunk.code[frame.ip++];
           await _invoke(method, argCount);
           frame = _frames.last; // Frame might have changed
           break;
 
         case OpCode.superInvoke:
-          final method = frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
+          final method =
+              frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
           final argCount = frame.chunk.code[frame.ip++];
           final superclass = pop() as ObjClass;
           await _invokeSuper(method, argCount, superclass);
@@ -481,23 +518,48 @@ class VM {
           final target = pop();
 
           if (target is List) {
-            if (index is! int) throw reportRuntimeError(getCurrentLine(), "List index must be an integer.");
+            if (index is! int)
+              throw reportRuntimeError(
+                getCurrentLine(),
+                "List index must be an integer.",
+              );
             if (index < 0 || index >= target.length) {
-              throw reportRuntimeError(getCurrentLine(), "List index out of bounds.");
+              throw reportRuntimeError(
+                getCurrentLine(),
+                "List index out of bounds.",
+              );
             }
             push(target[index]);
           } else if (target is Map) {
-            if (index is! String) throw reportRuntimeError(getCurrentLine(), "Map key must be a string.");
-            if (!target.containsKey(index)) throw reportRuntimeError(getCurrentLine(), "Map key '$index' not found.");
+            if (index is! String)
+              throw reportRuntimeError(
+                getCurrentLine(),
+                "Map key must be a string.",
+              );
+            if (!target.containsKey(index))
+              throw reportRuntimeError(
+                getCurrentLine(),
+                "Map key '$index' not found.",
+              );
             push(target[index]);
           } else if (target is String) {
-            if (index is! int) throw reportRuntimeError(getCurrentLine(), "String index must be an integer.");
+            if (index is! int)
+              throw reportRuntimeError(
+                getCurrentLine(),
+                "String index must be an integer.",
+              );
             if (index < 0 || index >= target.length) {
-              throw reportRuntimeError(getCurrentLine(), "String index out of bounds.");
+              throw reportRuntimeError(
+                getCurrentLine(),
+                "String index out of bounds.",
+              );
             }
             push(target[index]);
           } else {
-            throw reportRuntimeError(getCurrentLine(), "Can only index lists, maps, and strings.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Can only index lists, maps, and strings.",
+            );
           }
           break;
 
@@ -507,16 +569,30 @@ class VM {
           final target = pop();
 
           if (target is List) {
-            if (index is! int) throw reportRuntimeError(getCurrentLine(), "List index must be an integer.");
+            if (index is! int)
+              throw reportRuntimeError(
+                getCurrentLine(),
+                "List index must be an integer.",
+              );
             if (index < 0 || index >= target.length) {
-              throw reportRuntimeError(getCurrentLine(), "List index out of bounds.");
+              throw reportRuntimeError(
+                getCurrentLine(),
+                "List index out of bounds.",
+              );
             }
             target[index] = value;
           } else if (target is Map) {
-            if (index is! String) throw reportRuntimeError(getCurrentLine(), "Map key must be a string.");
+            if (index is! String)
+              throw reportRuntimeError(
+                getCurrentLine(),
+                "Map key must be a string.",
+              );
             target[index] = value;
           } else {
-            throw reportRuntimeError(getCurrentLine(), "Can only set index on lists and maps.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Can only set index on lists and maps.",
+            );
           }
           push(value); // Assignment expression evaluates to the assigned value
           break;
@@ -530,7 +606,10 @@ class VM {
         case OpCode.inherit:
           final superclass = peek(0);
           if (superclass is! ObjClass) {
-            throw RuntimeError.withLine(getCurrentLine(), "Superclass must be a class.");
+            throw RuntimeError.withLine(
+              getCurrentLine(),
+              "Superclass must be a class.",
+            );
           }
           final subclass = peek(1) as ObjClass;
           subclass.superclass = superclass;
@@ -557,7 +636,10 @@ class VM {
           }
 
           if (klass == null) {
-            throw RuntimeError.withLine(getCurrentLine(), "Could not find class for method definition.");
+            throw RuntimeError.withLine(
+              getCurrentLine(),
+              "Could not find class for method definition.",
+            );
           }
           klass.methods[name] = method;
           pop(); // Pop method
@@ -588,7 +670,10 @@ class VM {
               break;
             }
 
-            throw RuntimeError.withLine(getCurrentLine(), "Undefined property '$name'.");
+            throw RuntimeError.withLine(
+              getCurrentLine(),
+              "Undefined property '$name'.",
+            );
           }
 
           final nativeMethod = _getNativeMethod(receiver, name);
@@ -611,7 +696,10 @@ class VM {
 
           if (receiver is ObjInstance) {
             if (name == "fields") {
-              throw reportRuntimeError(getCurrentLine(), "Cannot assign to reserved property 'fields'.");
+              throw reportRuntimeError(
+                getCurrentLine(),
+                "Cannot assign to reserved property 'fields'.",
+              );
             }
             receiver.fields[name] = value;
             pop();
@@ -646,7 +734,10 @@ class VM {
 
           final method = superclass.methods[name];
           if (method == null) {
-            throw reportRuntimeError(getCurrentLine(), "Undefined property '$name'.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Undefined property '$name'.",
+            );
           }
 
           pop();
@@ -699,7 +790,10 @@ class VM {
               push(false);
             }
           } else {
-            throw reportRuntimeError(getCurrentLine(), "Invalid type operand for 'is'.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Invalid type operand for 'is'.",
+            );
           }
           break;
 
@@ -709,7 +803,10 @@ class VM {
           if (a is int && b is int) {
             push(a & b);
           } else {
-            throw reportRuntimeError(getCurrentLine(), "Operands must be integers.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Operands must be integers.",
+            );
           }
           break;
 
@@ -719,7 +816,10 @@ class VM {
           if (a is int && b is int) {
             push(a | b);
           } else {
-            throw reportRuntimeError(getCurrentLine(), "Operands must be integers.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Operands must be integers.",
+            );
           }
           break;
 
@@ -729,7 +829,10 @@ class VM {
           if (a is int && b is int) {
             push(a ^ b);
           } else {
-            throw reportRuntimeError(getCurrentLine(), "Operands must be integers.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Operands must be integers.",
+            );
           }
           break;
 
@@ -738,7 +841,10 @@ class VM {
           if (a is int) {
             push(~a);
           } else {
-            throw reportRuntimeError(getCurrentLine(), "Operand must be an integer.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Operand must be an integer.",
+            );
           }
           break;
 
@@ -748,7 +854,10 @@ class VM {
           if (a is int && b is int) {
             push(a << b);
           } else {
-            throw reportRuntimeError(getCurrentLine(), "Operands must be integers.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Operands must be integers.",
+            );
           }
           break;
 
@@ -758,7 +867,10 @@ class VM {
           if (a is int && b is int) {
             push(a >> b);
           } else {
-            throw reportRuntimeError(getCurrentLine(), "Operands must be integers.");
+            throw reportRuntimeError(
+              getCurrentLine(),
+              "Operands must be integers.",
+            );
           }
           break;
 
@@ -772,7 +884,10 @@ class VM {
   Future<void> _callValue(Object? callee, int argCount) async {
     if (callee is ObjClosure) {
       if (argCount != callee.function.arity) {
-        throw reportRuntimeError(getCurrentLine(), "Expected ${callee.function.arity} arguments but got $argCount.");
+        throw reportRuntimeError(
+          getCurrentLine(),
+          "Expected ${callee.function.arity} arguments but got $argCount.",
+        );
       }
       _frames.add(CallFrame(callee, _sp - argCount - 1));
       return;
@@ -788,7 +903,10 @@ class VM {
       return;
     } else if (callee is Callable) {
       if (argCount != callee.arity) {
-        throw reportRuntimeError(getCurrentLine(), "Expected ${callee.arity} arguments but got $argCount.");
+        throw reportRuntimeError(
+          getCurrentLine(),
+          "Expected ${callee.arity} arguments but got $argCount.",
+        );
       }
       final args = <dynamic>[];
       for (int i = 0; i < argCount; i++) {
@@ -809,7 +927,10 @@ class VM {
         _frames.add(CallFrame(initializer, _sp - argCount - 1));
         return;
       } else if (argCount != 0) {
-        throw reportRuntimeError(getCurrentLine(), "Expected 0 arguments but got $argCount.");
+        throw reportRuntimeError(
+          getCurrentLine(),
+          "Expected 0 arguments but got $argCount.",
+        );
       }
 
       // No init method, instance is already on stack, just return
@@ -824,7 +945,10 @@ class VM {
       return;
     }
 
-    throw reportRuntimeError(getCurrentLine(), "Can only call functions and classes.");
+    throw reportRuntimeError(
+      getCurrentLine(),
+      "Can only call functions and classes.",
+    );
   }
 
   ObjUpvalue _captureUpvalue(int local) {
@@ -890,36 +1014,52 @@ class VM {
 
   NativeMethod? _getNativeMethod(Object? receiver, String name) {
     if (receiver is String) {
-      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.string).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(
+        NativeMethodTarget.string,
+      ).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is List) {
-      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.list).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(
+        NativeMethodTarget.list,
+      ).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is Map) {
-      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.map).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(
+        NativeMethodTarget.map,
+      ).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is num) {
-      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.number).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(
+        NativeMethodTarget.number,
+      ).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is bool) {
-      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.boolean).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(
+        NativeMethodTarget.boolean,
+      ).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is DateTime) {
-      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.date).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(
+        NativeMethodTarget.date,
+      ).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is Duration) {
-      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.duration).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(
+        NativeMethodTarget.duration,
+      ).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is Future) {
       print("got it");
-      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.future).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(
+        NativeMethodTarget.future,
+      ).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     }
@@ -932,7 +1072,10 @@ class VM {
   ///
   /// Unlike a normal CALL opcode, this runs the closure to completion and
   /// returns the result synchronously (within the async context).
-  Future<Object?> callClosure(ObjClosure closure, List<dynamic> arguments) async {
+  Future<Object?> callClosure(
+    ObjClosure closure,
+    List<dynamic> arguments,
+  ) async {
     // Validate arity
     if (arguments.length != closure.function.arity) {
       throw reportRuntimeError(
@@ -982,7 +1125,10 @@ class VM {
         return;
       }
 
-      throw RuntimeError.withLine(getCurrentLine(), "Undefined property '$name'.");
+      throw RuntimeError.withLine(
+        getCurrentLine(),
+        "Undefined property '$name'.",
+      );
     }
 
     final nativeMethod = _getNativeMethod(receiver, name);
@@ -992,13 +1138,23 @@ class VM {
       return;
     }
 
-    throw RuntimeError.withLine(getCurrentLine(), "Only instances have methods. Name: $name, Receiver: $receiver");
+    throw RuntimeError.withLine(
+      getCurrentLine(),
+      "Only instances have methods. Name: $name, Receiver: $receiver",
+    );
   }
 
-  Future<void> _invokeSuper(String name, int argCount, ObjClass superclass) async {
+  Future<void> _invokeSuper(
+    String name,
+    int argCount,
+    ObjClass superclass,
+  ) async {
     final method = superclass.methods[name];
     if (method == null) {
-      throw RuntimeError.withLine(getCurrentLine(), "Undefined property '$name'.");
+      throw RuntimeError.withLine(
+        getCurrentLine(),
+        "Undefined property '$name'.",
+      );
     }
 
     // Receiver is at peek(argCount)

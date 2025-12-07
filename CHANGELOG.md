@@ -16,3 +16,6 @@ Public release.
 
 # 1.0.4
 - Linter pass.
+
+# 1.0.5
+- `dart format` pass.

@@ -186,7 +186,9 @@ void _defineVmSystemFunctions(VM vm) {
 /// ```
 String jsonEncode(List args) {
   if (args[0] is! Map) {
-    throw RuntimeError("jsonEncode: Expected a map object, but got ${args[0].runtimeType}");
+    throw RuntimeError(
+      "jsonEncode: Expected a map object, but got ${args[0].runtimeType}",
+    );
   }
 
   _arityCheck(1, args.length);
@@ -216,7 +218,9 @@ String jsonEncode(List args) {
 Map<String, dynamic> jsonDecode(List args) {
   _arityCheck(1, args.length);
   if (args[0] is! String) {
-    throw RuntimeError("jsonDecode: Expected a string, but got ${args[0].runtimeType}");
+    throw RuntimeError(
+      "jsonDecode: Expected a string, but got ${args[0].runtimeType}",
+    );
   }
 
   return json.jsonDecode(
@@ -290,7 +294,8 @@ void _numberTypeCheck(Object value) {
 }
 
 void _arityCheck(int expected, int actual) {
-  if (expected != actual) throw RuntimeError("Arity mismatch. Expected $expected, got $actual.");
+  if (expected != actual)
+    throw RuntimeError("Arity mismatch. Expected $expected, got $actual.");
 }
 
 void _stringTypeCheck(Object arg) {

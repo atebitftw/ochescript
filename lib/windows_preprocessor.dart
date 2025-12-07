@@ -39,6 +39,8 @@ class WindowsPlatformPreProcessor extends IncludesPreprocesser {
       }
     }
 
-    throw Exception("Library $lib not found on any provided path(s). Paths: $librarySearchPaths");
+    throw Exception(
+      "Library $lib not found on any provided path(s). Paths: $librarySearchPaths",
+    );
   }
 }

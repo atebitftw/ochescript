@@ -9,10 +9,22 @@ class RuntimeError implements Exception {
   final int? line;
   final String? file;
 
-  RuntimeError(this.message) : token = null, statement = null, line = null, file = null;
-  RuntimeError.withToken(this.token, this.message) : statement = null, line = null, file = null;
-  RuntimeError.withStatement(this.statement, this.message) : token = null, line = null, file = null;
-  RuntimeError.withLine(this.line, this.message, {this.file}) : statement = null, token = null;
+  RuntimeError(this.message)
+    : token = null,
+      statement = null,
+      line = null,
+      file = null;
+  RuntimeError.withToken(this.token, this.message)
+    : statement = null,
+      line = null,
+      file = null;
+  RuntimeError.withStatement(this.statement, this.message)
+    : token = null,
+      line = null,
+      file = null;
+  RuntimeError.withLine(this.line, this.message, {this.file})
+    : statement = null,
+      token = null;
 
   @override
   String toString() {

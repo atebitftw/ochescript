@@ -1,5 +1,6 @@
 import 'package:oche_script/oche_script.dart';
-import 'package:oche_script/src/runtime/closure_invoker.dart' show invokeScriptClosure;
+import 'package:oche_script/src/runtime/closure_invoker.dart'
+    show invokeScriptClosure;
 
 /// Registers all native methods for the Map type.
 /// This is called automatically by the VM.
@@ -44,10 +45,15 @@ class ForEach extends NativeMethodDefinition<Map<String, Object>, int> {
         arity: 1,
         function: (target, vm, arguments) async {
           if (arguments[0] is! ObjClosure) {
-            throw RuntimeError("forEach arg must be a function: (key, value) {...}");
+            throw RuntimeError(
+              "forEach arg must be a function: (key, value) {...}",
+            );
           }
           for (final entry in target.entries) {
-            await invokeScriptClosure(vm, arguments[0], [entry.key, entry.value]);
+            await invokeScriptClosure(vm, arguments[0], [
+              entry.key,
+              entry.value,
+            ]);
           }
           return target.length;
         },
@@ -60,7 +66,8 @@ class ForEach extends NativeMethodDefinition<Map<String, Object>, int> {
 /// var mp = {"a": 1, "b": 2, "c": 3};
 /// mp.clear();
 /// ```
-class Clear extends NativeMethodDefinition<Map<String, Object>, Map<String, Object>> {
+class Clear
+    extends NativeMethodDefinition<Map<String, Object>, Map<String, Object>> {
   Clear()
     : super(
         methodName: "clear",
@@ -79,7 +86,8 @@ class Clear extends NativeMethodDefinition<Map<String, Object>, Map<String, Obje
 /// var mp = {"a": 1, "b": 2, "c": 3};
 /// mp.remove("b");
 /// ```
-class Remove extends NativeMethodDefinition<Map<String, Object>, Map<String, Object>> {
+class Remove
+    extends NativeMethodDefinition<Map<String, Object>, Map<String, Object>> {
   Remove()
     : super(
         methodName: "remove",
@@ -101,7 +109,8 @@ class Remove extends NativeMethodDefinition<Map<String, Object>, Map<String, Obj
 /// var mp = {"a": 1, "b": 2, "c": 3};
 /// mp.merge({"d": 4, "e": 5});
 /// ```
-class Merge extends NativeMethodDefinition<Map<String, Object>, Map<String, Object>> {
+class Merge
+    extends NativeMethodDefinition<Map<String, Object>, Map<String, Object>> {
   Merge()
     : super(
         methodName: "merge",

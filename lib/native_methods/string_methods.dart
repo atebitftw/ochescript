@@ -198,12 +198,19 @@ class SubString extends NativeMethodDefinition<String, String> {
             throw RuntimeError("substring() takes two integers as arguments.");
           }
 
-          if (from < 0 || to < 0 || from > target.length || to > target.length) {
-            throw RuntimeError("substring() arguments must be between 0 and the length of the string.");
+          if (from < 0 ||
+              to < 0 ||
+              from > target.length ||
+              to > target.length) {
+            throw RuntimeError(
+              "substring() arguments must be between 0 and the length of the string.",
+            );
           }
 
           if (from > to) {
-            throw RuntimeError("substring() arguments must be in the order from, to.");
+            throw RuntimeError(
+              "substring() arguments must be in the order from, to.",
+            );
           }
 
           return target.substring(from, to);

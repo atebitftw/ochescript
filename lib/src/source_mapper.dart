@@ -22,7 +22,8 @@ class SourceMapper {
   final List<_SourceRange> _ranges = [];
   final String _defaultFile;
 
-  SourceMapper(String source, {String defaultFile = "script"}) : _defaultFile = defaultFile {
+  SourceMapper(String source, {String defaultFile = "script"})
+    : _defaultFile = defaultFile {
     _parse(source);
   }
 
@@ -38,7 +39,9 @@ class SourceMapper {
       if (line.startsWith("// #source ")) {
         currentName = line.substring("// #source ".length).trim();
         startLine = lineNum;
-      } else if (line.startsWith("// #end_source ") && currentName != null && startLine != null) {
+      } else if (line.startsWith("// #end_source ") &&
+          currentName != null &&
+          startLine != null) {
         final endName = line.substring("// #end_source ".length).trim();
         if (endName == currentName) {
           _ranges.add(_SourceRange(currentName, startLine, lineNum));

@@ -7,5 +7,6 @@ class ParseError extends Error {
   ParseError(this.token, {this.message = ""});
 
   @override
-  String toString() => "ParseError: ${token.line}, ${token.type}, ${token.lexeme}, $message";
+  String toString() =>
+      "ParseError: ${token.line}, ${token.type}, ${token.lexeme}, $message";
 }

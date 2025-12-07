@@ -1,13 +1,20 @@
 import 'package:oche_script/oche_script.dart';
 import 'package:oche_script/src/compiler/lexer.dart';
 import 'package:oche_script/src/compiler/parser.dart';
-import 'package:oche_script/native_functions/define_native_functions.dart' show defineVmNativeFunctions;
-import 'package:oche_script/native_methods/date_methods.dart' show registerDateExtensions;
-import 'package:oche_script/native_methods/duration_methods.dart' show registerDurationExtensions;
-import 'package:oche_script/native_methods/list_methods.dart' show registerListExtensions;
-import 'package:oche_script/native_methods/map_methods.dart' show registerMapExtensions;
-import 'package:oche_script/native_methods/number_methods.dart' show registerNumberExtensions;
-import 'package:oche_script/native_methods/string_methods.dart' show registerStringExtensions;
+import 'package:oche_script/native_functions/define_native_functions.dart'
+    show defineVmNativeFunctions;
+import 'package:oche_script/native_methods/date_methods.dart'
+    show registerDateExtensions;
+import 'package:oche_script/native_methods/duration_methods.dart'
+    show registerDurationExtensions;
+import 'package:oche_script/native_methods/list_methods.dart'
+    show registerListExtensions;
+import 'package:oche_script/native_methods/map_methods.dart'
+    show registerMapExtensions;
+import 'package:oche_script/native_methods/number_methods.dart'
+    show registerNumberExtensions;
+import 'package:oche_script/native_methods/string_methods.dart'
+    show registerStringExtensions;
 import 'package:oche_script/src/runtime/native_method.dart';
 import 'package:oche_script/src/compiler/compiler.dart';
 import 'package:oche_script/src/runtime/vm.dart' show VM;
@@ -16,7 +23,8 @@ import 'package:logging/logging.dart';
 export "src/includes_preprocesser.dart" show IncludesPreprocesser;
 export "src/runtime/runtime_error.dart" show RuntimeError;
 export "src/compiler/parse_error.dart" show ParseError;
-export "src/runtime/native_method.dart" show NativeMethodDefinition, NativeMethodTarget, NativeMethodFunction;
+export "src/runtime/native_method.dart"
+    show NativeMethodDefinition, NativeMethodTarget, NativeMethodFunction;
 export 'package:oche_script/src/runtime/obj.dart' show ObjClosure;
 
 final _log = Logger.root;
@@ -25,7 +33,8 @@ final _log = Logger.root;
 typedef OutCallback = void Function(String name, Object value);
 
 /// Defines a signature for a callback function that handles dart() function calls at runtime.
-typedef DartFunctionCallback = Future<Object> Function(String name, List<dynamic> args);
+typedef DartFunctionCallback =
+    Future<Object> Function(String name, List<dynamic> args);
 
 /// Defines a signature for a native function.
 typedef NativeFunction = Function(List<Object> args);
@@ -125,12 +134,18 @@ Future<Map<String, Object>> _run(
   }
 
   dartFunctionCallback ??= (_, _) {
-    throw vm.reportRuntimeError(vm.getCurrentLine(), "dart() function callback is not registered.");
+    throw vm.reportRuntimeError(
+      vm.getCurrentLine(),
+      "dart() function callback is not registered.",
+    );
   };
 
   vm.defineNative("dart", (args) {
     if (args.isEmpty) {
-      throw vm.reportRuntimeError(vm.getCurrentLine(), "dart() requires function name");
+      throw vm.reportRuntimeError(
+        vm.getCurrentLine(),
+        "dart() requires function name",
+      );
     }
     final name = args[0] as String;
 

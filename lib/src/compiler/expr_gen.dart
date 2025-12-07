@@ -240,7 +240,13 @@ class Index extends Expr {
 }
 
 class SetIndex extends Expr {
-  SetIndex(this.object, this.bracket, this.index, this.value, {required super.token});
+  SetIndex(
+    this.object,
+    this.bracket,
+    this.index,
+    this.value, {
+    required super.token,
+  });
 
   final Expr object;
   final Token bracket;
