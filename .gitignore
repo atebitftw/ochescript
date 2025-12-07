@@ -28,3 +28,4 @@ pubspec.lock
 !tool/vs_code_syntax_highlighter/ochescript/*.js
 
 .vscode/
+!tool/vs_code_syntax_highlighter/ochescript/.vscode

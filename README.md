@@ -110,7 +110,9 @@ Most scripts will rarely come close to this limit (most will never exceed 100). 
 *   I'm open to other ideas.
 
 ## Syntax Highlighting Support in VSCode
-In [VS Code Extension](https://github.com/atebitftw/oche_script/tree/main/tool/vs_code_syntax_highlighter/ochescript) there is a a VSCode extension project that provides basic syntax highlighting for OcheScript files (.oche). You can use this extension by importing the `.vsix` file into VSCode manually.
+In [VS Code Extension](https://github.com/atebitftw/ochescript/tree/main/tool/vs_code_syntax_highlighter/ochescript) there is a a VSCode extension project that provides basic syntax highlighting for OcheScript files (.oche). You can use this extension by importing the `.vsix` file into VSCode manually.
+
+You can find the compiled .vsix extension file in the bin/ directory of this project: [here](https://github.com/atebitftw/ochescript/tree/main/bin)
 
 ## About Me
 My name is John, and if you've been a Dart enthusiast prior to M1 (way before v1 release), then we are probably friends.
