@@ -58,7 +58,10 @@ void main() {
       expect(tokens[6].literal, "b");
       expect(tokens[7].type, TokenType.RIGHT_PAREN); // The } ends the group
 
-      expect(tokens[8].type, TokenType.RIGHT_PAREN); // End of string interpolation
+      expect(
+        tokens[8].type,
+        TokenType.RIGHT_PAREN,
+      ); // End of string interpolation
       expect(tokens[9].type, TokenType.EOF);
     });
 

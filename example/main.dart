@@ -24,7 +24,9 @@ void main() async {
     initialGlobalState: {"globalStuff": 25},
 
     // We are using the WindowsPlatformPreProcessor to handle include directives.
-    preprocesser: WindowsPlatformPreProcessor(librarySearchPaths: {"./", "./includes"}),
+    preprocesser: WindowsPlatformPreProcessor(
+      librarySearchPaths: {"./", "./includes"},
+    ),
 
     // Not strictly necessary, but we are including a callback for any out()
     // calls made by the script.  These are also stored in the output map return

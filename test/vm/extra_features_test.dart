@@ -1,8 +1,11 @@
-import 'package:oche_script/native_methods/duration_methods.dart' as duration_methods;
+import 'package:oche_script/native_methods/duration_methods.dart'
+    as duration_methods;
 import 'package:oche_script/native_methods/list_methods.dart' as list_methods;
 import 'package:oche_script/native_methods/map_methods.dart' as map_methods;
-import 'package:oche_script/native_methods/number_methods.dart' as number_methods;
-import 'package:oche_script/native_methods/string_methods.dart' as string_methods;
+import 'package:oche_script/native_methods/number_methods.dart'
+    as number_methods;
+import 'package:oche_script/native_methods/string_methods.dart'
+    as string_methods;
 import 'package:oche_script/src/runtime/vm.dart' show VM;
 import 'package:test/test.dart';
 import 'package:oche_script/oche_script.dart';

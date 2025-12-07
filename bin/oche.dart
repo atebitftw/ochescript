@@ -27,9 +27,13 @@ Future<int> main(List<String> args) async {
 
   final result = await oche.compileAndRun(
     source,
-    preprocesser: WindowsPlatformPreProcessor(librarySearchPaths: <String>{"./", "./includes"}),
+    preprocesser: WindowsPlatformPreProcessor(
+      librarySearchPaths: <String>{"./", "./includes"},
+    ),
     dartFunctionCallback: (name, arguments) async {
-      _logger.info("dart() -> Requested function call '$name' with args: $arguments.  Returning: $arguments");
+      _logger.info(
+        "dart() -> Requested function call '$name' with args: $arguments.  Returning: $arguments",
+      );
       return arguments;
     },
     outCallback: (name, value) {

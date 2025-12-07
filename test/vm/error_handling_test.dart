@@ -26,7 +26,10 @@ void main() {
 
     test('Accessing undefined variable throws error', () async {
       final result = await run('out("val", undefinedVariable);');
-      expect(result["error"], contains("Undefined variable 'undefinedVariable'"));
+      expect(
+        result["error"],
+        contains("Undefined variable 'undefinedVariable'"),
+      );
     });
 
     test('Adding invalid types throws error', () async {

@@ -4,11 +4,14 @@ import 'package:oche_script/src/compiler/parser.dart';
 import 'package:oche_script/src/compiler/compiler.dart';
 import 'package:oche_script/src/runtime/vm.dart';
 import 'package:oche_script/native_methods/list_methods.dart' as list_methods;
-import 'package:oche_script/native_methods/string_methods.dart' as string_methods;
+import 'package:oche_script/native_methods/string_methods.dart'
+    as string_methods;
 import 'package:oche_script/native_methods/map_methods.dart' as map_methods;
-import 'package:oche_script/native_methods/number_methods.dart' as number_methods;
+import 'package:oche_script/native_methods/number_methods.dart'
+    as number_methods;
 import 'package:oche_script/native_methods/date_methods.dart' as date_methods;
-import 'package:oche_script/native_methods/duration_methods.dart' as duration_methods;
+import 'package:oche_script/native_methods/duration_methods.dart'
+    as duration_methods;
 
 void main() {
   group('VM Native Methods', () {
@@ -37,27 +40,37 @@ void main() {
 
     group('String Methods', () {
       test('length', () async {
-        final result = await run('var s = "hello"; var len = s.length(); out("len", len);');
+        final result = await run(
+          'var s = "hello"; var len = s.length(); out("len", len);',
+        );
         expect(result['len'], 5);
       });
 
       test('toUpper', () async {
-        final result = await run('var s = "hello"; var upper = s.toUpper(); out("upper", upper);');
+        final result = await run(
+          'var s = "hello"; var upper = s.toUpper(); out("upper", upper);',
+        );
         expect(result['upper'], "HELLO");
       });
 
       test('toLower', () async {
-        final result = await run('var s = "HELLO"; var lower = s.toLower(); out("lower", lower);');
+        final result = await run(
+          'var s = "HELLO"; var lower = s.toLower(); out("lower", lower);',
+        );
         expect(result['lower'], "hello");
       });
 
       test('isNotEmpty', () async {
-        final result = await run('var s = "hello"; var notEmpty = s.isNotEmpty(); out("notEmpty", notEmpty);');
+        final result = await run(
+          'var s = "hello"; var notEmpty = s.isNotEmpty(); out("notEmpty", notEmpty);',
+        );
         expect(result['notEmpty'], true);
       });
 
       test('isEmpty', () async {
-        final result = await run('var s = ""; var empty = s.isEmpty(); out("empty", empty);');
+        final result = await run(
+          'var s = ""; var empty = s.isEmpty(); out("empty", empty);',
+        );
         expect(result['empty'], true);
       });
 
@@ -76,54 +89,74 @@ void main() {
       });
 
       test('substring', () async {
-        final result = await run('var s = "hello"; var sub = s.substring(1, 4); out("sub", sub);');
+        final result = await run(
+          'var s = "hello"; var sub = s.substring(1, 4); out("sub", sub);',
+        );
         expect(result['sub'], "ell");
       });
 
       test('head', () async {
-        final result = await run('var s = "hello"; var h = s.head(); out("h", h);');
+        final result = await run(
+          'var s = "hello"; var h = s.head(); out("h", h);',
+        );
         expect(result['h'], "h");
       });
 
       test('tail', () async {
-        final result = await run('var s = "hello"; var t = s.tail(); out("t", t);');
+        final result = await run(
+          'var s = "hello"; var t = s.tail(); out("t", t);',
+        );
         expect(result['t'], "ello");
       });
 
       test('compareTo', () async {
-        final result = await run('var s1 = "a"; var s2 = "b"; var res = s1.compareTo(s2); out("res", res);');
+        final result = await run(
+          'var s1 = "a"; var s2 = "b"; var res = s1.compareTo(s2); out("res", res);',
+        );
         expect(result['res'], lessThan(0));
       });
 
       test('trim', () async {
-        final result = await run('var s = "  hello  "; var trimmed = s.trim(); out("trimmed", trimmed);');
+        final result = await run(
+          'var s = "  hello  "; var trimmed = s.trim(); out("trimmed", trimmed);',
+        );
         expect(result['trimmed'], "hello");
       });
     });
 
     group('Number Methods', () {
       test('toString', () async {
-        final result = await run('var n = 123; var s = n.toString(); out("s", s);');
+        final result = await run(
+          'var n = 123; var s = n.toString(); out("s", s);',
+        );
         expect(result['s'], "123");
       });
 
       test('isOdd', () async {
-        final result = await run('var n = 3; var odd = n.isOdd(); out("odd", odd);');
+        final result = await run(
+          'var n = 3; var odd = n.isOdd(); out("odd", odd);',
+        );
         expect(result['odd'], true);
       });
 
       test('isEven', () async {
-        final result = await run('var n = 2; var even = n.isEven(); out("even", even);');
+        final result = await run(
+          'var n = 2; var even = n.isEven(); out("even", even);',
+        );
         expect(result['even'], true);
       });
 
       test('truncate', () async {
-        final result = await run('var n = 3.5; var t = n.truncate(); out("t", t);');
+        final result = await run(
+          'var n = 3.5; var t = n.truncate(); out("t", t);',
+        );
         expect(result['t'], 3);
       });
 
       test('floor', () async {
-        final result = await run('var n = 3.5; var f = n.floor(); out("f", f);');
+        final result = await run(
+          'var n = 3.5; var f = n.floor(); out("f", f);',
+        );
         expect(result['f'], 3);
       });
 
@@ -133,7 +166,9 @@ void main() {
       });
 
       test('round', () async {
-        final result = await run('var n = 3.5; var r = n.round(); out("r", r);');
+        final result = await run(
+          'var n = 3.5; var r = n.round(); out("r", r);',
+        );
         expect(result['r'], 4);
       });
 
@@ -165,67 +200,93 @@ void main() {
 
     group('List Methods', () {
       test('length', () async {
-        final result = await run('var l = [1, 2, 3]; var len = l.length(); out("len", len);');
+        final result = await run(
+          'var l = [1, 2, 3]; var len = l.length(); out("len", len);',
+        );
         expect(result['len'], 3);
       });
 
       test('add', () async {
-        final result = await run('var l = []; l.add(1); var len = l.length(); out("len", len);');
+        final result = await run(
+          'var l = []; l.add(1); var len = l.length(); out("len", len);',
+        );
         expect(result['len'], 1);
       });
 
       test('addAll', () async {
-        final result = await run('var l = [1]; l.addAll([2, 3]); var len = l.length(); out("len", len);');
+        final result = await run(
+          'var l = [1]; l.addAll([2, 3]); var len = l.length(); out("len", len);',
+        );
         expect(result['len'], 3);
       });
 
       test('isEmpty', () async {
-        final result = await run('var l = []; var empty = l.isEmpty(); out("empty", empty);');
+        final result = await run(
+          'var l = []; var empty = l.isEmpty(); out("empty", empty);',
+        );
         expect(result['empty'], true);
       });
 
       test('isNotEmpty', () async {
-        final result = await run('var l = [1]; var notEmpty = l.isNotEmpty(); out("notEmpty", notEmpty);');
+        final result = await run(
+          'var l = [1]; var notEmpty = l.isNotEmpty(); out("notEmpty", notEmpty);',
+        );
         expect(result['notEmpty'], true);
       });
 
       test('contains', () async {
-        final result = await run('var l = [1, 2, 3]; var has2 = l.contains(2); out("has2", has2);');
+        final result = await run(
+          'var l = [1, 2, 3]; var has2 = l.contains(2); out("has2", has2);',
+        );
         expect(result['has2'], true);
       });
 
       test('indexOf', () async {
-        final result = await run('var l = ["a", "b"]; var idx = l.indexOf("b"); out("idx", idx);');
+        final result = await run(
+          'var l = ["a", "b"]; var idx = l.indexOf("b"); out("idx", idx);',
+        );
         expect(result['idx'], 1);
       });
 
       test('head', () async {
-        final result = await run('var l = [1, 2, 3]; var h = l.head(); out("h", h);');
+        final result = await run(
+          'var l = [1, 2, 3]; var h = l.head(); out("h", h);',
+        );
         expect(result['h'], 1);
       });
 
       test('tail', () async {
-        final result = await run('var l = [1, 2, 3]; var t = l.tail(); var first = t[0]; out("first", first);');
+        final result = await run(
+          'var l = [1, 2, 3]; var t = l.tail(); var first = t[0]; out("first", first);',
+        );
         expect(result['first'], 2);
       });
 
       test('join', () async {
-        final result = await run('var l = ["a", "b"]; var s = l.join(","); out("s", s);');
+        final result = await run(
+          'var l = ["a", "b"]; var s = l.join(","); out("s", s);',
+        );
         expect(result['s'], "a,b");
       });
 
       test('clear', () async {
-        final result = await run('var l = [1, 2]; l.clear(); var len = l.length(); out("len", len);');
+        final result = await run(
+          'var l = [1, 2]; l.clear(); var len = l.length(); out("len", len);',
+        );
         expect(result['len'], 0);
       });
 
       test('removeAt', () async {
-        final result = await run('var l = [1, 2, 3]; l.removeAt(1); var val = l[1]; out("val", val);');
+        final result = await run(
+          'var l = [1, 2, 3]; l.removeAt(1); var val = l[1]; out("val", val);',
+        );
         expect(result['val'], 3);
       });
 
       test('reversed', () async {
-        final result = await run('var l = [1, 2]; var r = l.reversed(); var first = r[0]; out("first", first);');
+        final result = await run(
+          'var l = [1, 2]; var r = l.reversed(); var first = r[0]; out("first", first);',
+        );
         expect(result['first'], 2);
       });
 
@@ -279,37 +340,51 @@ void main() {
 
     group('Map Methods', () {
       test('length', () async {
-        final result = await run('var m = {"a": 1}; var len = m.length(); out("len", len);');
+        final result = await run(
+          'var m = {"a": 1}; var len = m.length(); out("len", len);',
+        );
         expect(result['len'], 1);
       });
 
       test('keys', () async {
-        final result = await run('var m = {"a": 1}; var k = m.keys(); var first = k[0]; out("first", first);');
+        final result = await run(
+          'var m = {"a": 1}; var k = m.keys(); var first = k[0]; out("first", first);',
+        );
         expect(result['first'], "a");
       });
 
       test('values', () async {
-        final result = await run('var m = {"a": 1}; var v = m.values(); var first = v[0]; out("first", first);');
+        final result = await run(
+          'var m = {"a": 1}; var v = m.values(); var first = v[0]; out("first", first);',
+        );
         expect(result['first'], 1);
       });
 
       test('containsKey', () async {
-        final result = await run('var m = {"a": 1}; var hasA = m.containsKey("a"); out("hasA", hasA);');
+        final result = await run(
+          'var m = {"a": 1}; var hasA = m.containsKey("a"); out("hasA", hasA);',
+        );
         expect(result['hasA'], true);
       });
 
       test('containsValue', () async {
-        final result = await run('var m = {"a": 1}; var has1 = m.containsValue(1); out("has1", has1);');
+        final result = await run(
+          'var m = {"a": 1}; var has1 = m.containsValue(1); out("has1", has1);',
+        );
         expect(result['has1'], true);
       });
 
       test('isEmpty', () async {
-        final result = await run('var m = {}; var empty = m.isEmpty(); out("empty", empty);');
+        final result = await run(
+          'var m = {}; var empty = m.isEmpty(); out("empty", empty);',
+        );
         expect(result['empty'], true);
       });
 
       test('isNotEmpty', () async {
-        final result = await run('var m = {"a": 1}; var notEmpty = m.isNotEmpty(); out("notEmpty", notEmpty);');
+        final result = await run(
+          'var m = {"a": 1}; var notEmpty = m.isNotEmpty(); out("notEmpty", notEmpty);',
+        );
         expect(result['notEmpty'], true);
       });
 
@@ -321,7 +396,9 @@ void main() {
       });
 
       test('clear', () async {
-        final result = await run('var m = {"a": 1}; m.clear(); var len = m.length(); out("len", len);');
+        final result = await run(
+          'var m = {"a": 1}; m.clear(); var len = m.length(); out("len", len);',
+        );
         expect(result['len'], 0);
       });
 

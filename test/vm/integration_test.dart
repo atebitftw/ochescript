@@ -15,7 +15,10 @@ void main() {
         out("result", a + b);
       """;
 
-      final result = await compileAndRun(source, preprocesser: MockPreprocesser());
+      final result = await compileAndRun(
+        source,
+        preprocesser: MockPreprocesser(),
+      );
 
       expect(result['result'], equals(30));
     });

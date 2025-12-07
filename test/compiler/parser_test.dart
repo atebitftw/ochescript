@@ -67,7 +67,9 @@ void main() {
     });
 
     test('parses for statement', () {
-      final statements = parse('for (var i = 0; i < 10; i = i + 1) { print i; }');
+      final statements = parse(
+        'for (var i = 0; i < 10; i = i + 1) { print i; }',
+      );
       expect(statements.length, 1);
       expect(statements[0], isA<For>());
       final forStmt = statements[0] as For;
@@ -132,7 +134,9 @@ void main() {
     });
 
     test('handles parse error and synchronizes', () {
-      final lexer = Lexer('var a = 1; var b = ; var c = 2;'); // Error in middle statement
+      final lexer = Lexer(
+        'var a = 1; var b = ; var c = 2;',
+      ); // Error in middle statement
       final tokens = lexer.scan();
       final parser = Parser(tokens);
       final statements = parser.parse();

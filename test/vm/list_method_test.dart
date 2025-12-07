@@ -4,11 +4,14 @@ import 'package:oche_script/src/compiler/parser.dart';
 import 'package:oche_script/src/compiler/compiler.dart';
 import 'package:oche_script/src/runtime/vm.dart';
 import 'package:oche_script/native_methods/list_methods.dart' as list_methods;
-import 'package:oche_script/native_methods/string_methods.dart' as string_methods;
+import 'package:oche_script/native_methods/string_methods.dart'
+    as string_methods;
 import 'package:oche_script/native_methods/map_methods.dart' as map_methods;
-import 'package:oche_script/native_methods/number_methods.dart' as number_methods;
+import 'package:oche_script/native_methods/number_methods.dart'
+    as number_methods;
 import 'package:oche_script/native_methods/date_methods.dart' as date_methods;
-import 'package:oche_script/native_methods/duration_methods.dart' as duration_methods;
+import 'package:oche_script/native_methods/duration_methods.dart'
+    as duration_methods;
 
 void main() {
   group('VM List Methods Tests', () {

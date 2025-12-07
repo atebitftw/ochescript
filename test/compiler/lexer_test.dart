@@ -88,7 +88,8 @@ void main() {
     });
 
     test('scans identifiers and keywords', () {
-      final source = 'var myVar = true; if else while for fun return class this super';
+      final source =
+          'var myVar = true; if else while for fun return class this super';
       final lexer = Lexer(source);
       final tokens = lexer.scan();
 

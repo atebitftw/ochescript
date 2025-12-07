@@ -23,15 +23,24 @@ void main() {
     }
 
     test("redeclare global throws RuntimeError", () {
-      expect(() => compile("var a = 10; var a = 20;"), throwsA(isA<RuntimeError>()));
+      expect(
+        () => compile("var a = 10; var a = 20;"),
+        throwsA(isA<RuntimeError>()),
+      );
     });
 
     test("redeclare local in same scope throws RuntimeError", () {
-      expect(() => compile("{ var a = 10; var a = 20; }"), throwsA(isA<RuntimeError>()));
+      expect(
+        () => compile("{ var a = 10; var a = 20; }"),
+        throwsA(isA<RuntimeError>()),
+      );
     });
 
     test("redeclare local in different scope returns normally", () {
-      expect(() => compile('''{ var a = 10; { var a = 20; } }'''), returnsNormally);
+      expect(
+        () => compile('''{ var a = 10; { var a = 20; } }'''),
+        returnsNormally,
+      );
     });
 
     test('compiles arithmetic', () {

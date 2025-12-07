@@ -4,11 +4,14 @@ import 'package:oche_script/src/compiler/parser.dart';
 import 'package:oche_script/src/compiler/compiler.dart';
 import 'package:oche_script/src/runtime/vm.dart';
 import 'package:oche_script/native_methods/list_methods.dart' as list_methods;
-import 'package:oche_script/native_methods/string_methods.dart' as string_methods;
+import 'package:oche_script/native_methods/string_methods.dart'
+    as string_methods;
 import 'package:oche_script/native_methods/map_methods.dart' as map_methods;
-import 'package:oche_script/native_methods/number_methods.dart' as number_methods;
+import 'package:oche_script/native_methods/number_methods.dart'
+    as number_methods;
 import 'package:oche_script/native_methods/date_methods.dart' as date_methods;
-import 'package:oche_script/native_methods/duration_methods.dart' as duration_methods;
+import 'package:oche_script/native_methods/duration_methods.dart'
+    as duration_methods;
 
 void main() {
   group('VM Number Methods Tests', () {
@@ -312,7 +315,10 @@ void main() {
           out("asin1", 1.asin());
         ''');
         expect(result['asin0'], 0.0);
-        expect((result['asin1'] as double).toStringAsFixed(4), "1.5708"); // pi/2
+        expect(
+          (result['asin1'] as double).toStringAsFixed(4),
+          "1.5708",
+        ); // pi/2
       });
 
       test('acos() returns arc cosine', () async {
@@ -321,7 +327,10 @@ void main() {
           out("acos0", 0.acos());
         ''');
         expect(result['acos1'], 0.0);
-        expect((result['acos0'] as double).toStringAsFixed(4), "1.5708"); // pi/2
+        expect(
+          (result['acos0'] as double).toStringAsFixed(4),
+          "1.5708",
+        ); // pi/2
       });
 
       test('atan() returns arc tangent', () async {
@@ -330,7 +339,10 @@ void main() {
           out("atan1", 1.atan());
         ''');
         expect(result['atan0'], 0.0);
-        expect((result['atan1'] as double).toStringAsFixed(4), "0.7854"); // pi/4
+        expect(
+          (result['atan1'] as double).toStringAsFixed(4),
+          "0.7854",
+        ); // pi/4
       });
 
       test('atan2() returns arc tangent of y/x', () async {

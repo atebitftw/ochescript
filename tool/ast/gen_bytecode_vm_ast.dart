@@ -51,7 +51,8 @@ void main(List<String> args) {
 
 void defineAst(String outputDir, String baseName, List<String> types) async {
   final buffer = StringBuffer();
-  String path = "${outputDir.toLowerCase()}${Platform.pathSeparator}${baseName.toLowerCase()}_gen.dart";
+  String path =
+      "${outputDir.toLowerCase()}${Platform.pathSeparator}${baseName.toLowerCase()}_gen.dart";
 
   buffer.writeln("// ignore_for_file: unused_import");
   buffer.writeln("import 'package:oche_script/src/compiler/expr.dart';");
@@ -90,7 +91,9 @@ void defineVisitor(StringBuffer buffer, String baseName, List<String> types) {
 
   for (final type in types) {
     final typeName = type.split(":")[0].trim();
-    buffer.writeln("   R visit$typeName$baseName($typeName ${baseName.toLowerCase()});");
+    buffer.writeln(
+      "   R visit$typeName$baseName($typeName ${baseName.toLowerCase()});",
+    );
   }
 
   buffer.writeln("}");
@@ -114,14 +117,21 @@ String _fieldListToParams(List<String> fields) {
   return sb.toString();
 }
 
-void defineType(StringBuffer buffer, String baseName, String className, String fieldList) {
+void defineType(
+  StringBuffer buffer,
+  String baseName,
+  String className,
+  String fieldList,
+) {
   buffer.writeln("class $className extends $baseName {");
 
   // Store parameters in fields.
   final fields = fieldList.split(", ");
 
   // Constructor.
-  buffer.writeln("   $className (${_fieldListToParams(fields)}{required super.token});");
+  buffer.writeln(
+    "   $className (${_fieldListToParams(fields)}{required super.token});",
+  );
 
   // Fields.
   buffer.writeln("");
