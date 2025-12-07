@@ -80,7 +80,9 @@ print("JSON: $json");
   <h2><span>Implementation</span></h2>
   <pre class="language-dart"><code class="language-dart">String jsonEncode(List args) {
   if (args[0] is! Map) {
-    throw RuntimeError(&quot;jsonEncode: Expected a map object, but got ${args[0].runtimeType}&quot;);
+    throw RuntimeError(
+      &quot;jsonEncode: Expected a map object, but got ${args[0].runtimeType}&quot;,
+    );
   }
 
   _arityCheck(1, args.length);
