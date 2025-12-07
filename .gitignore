@@ -26,3 +26,5 @@ doc/api/
 
 # Allow JS files for VS Code extension
 !tool/vs_code_syntax_highlighter/ochescript/*.js
+
+.vscode/
