@@ -23,6 +23,22 @@ I work on some very large-scale Flutter projects that sometimes require a bit of
 
 *Side Note: Dart technically does have arbitrary code execution capability via `dart:mirrors`, but I personally do not consider it to be a viable approach for many production application scenarios, especially anything Flutter-based (mirrors disallowed).  Another reason to avoid mirrors: As soon as you bring in mirrors, you lose tree-shaking.*
 
+## Hello World In OcheScript
+*In a text file with extension `.oche`*
+```js
+print("Hello World!");
+```
+
+Running from Dart:
+
+```dart
+import 'package:oche_script/oche_script.dart' as oche;
+
+Future<void> main() async {
+  final result = await oche.compileAndRun(r"print("Hello World!");");
+}
+```
+
 ## Getting Started
 See the [Getting Started](https://github.com/atebitftw/ochescript/blob/main/doc/getting_started.md) document for more information.
 
