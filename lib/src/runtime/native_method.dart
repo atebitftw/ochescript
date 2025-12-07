@@ -35,7 +35,7 @@ class NativeMethod implements Callable {
   }
 
   /// Registers a native method to the global registry.
-  static registerNativeMethod<T extends Object, R extends Object>(NativeMethodDefinition<T, R> definition) {
+  static void registerNativeMethod<T extends Object, R extends Object>(NativeMethodDefinition<T, R> definition) {
     switch (definition.targetType) {
       case NativeMethodTarget.string:
         _stringRegistry[definition.methodName] = definition as NativeMethodDefinition<String, R>;

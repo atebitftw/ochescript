@@ -104,7 +104,7 @@ class Parser {
   Stmt _classDeclaration() {
     Token name = _consume(TokenType.IDENTIFIER, "Expect class name.")!;
 
-    Variable? superclass = null;
+    Variable? superclass;
     if (_match([TokenType.EXTENDS])) {
       superclass = Variable(_consume(TokenType.IDENTIFIER, "Expect superclass name.")!, token: _previous());
     }
@@ -140,8 +140,8 @@ class Parser {
   }
 
   Stmt _function(String kind, {bool isAsync = false}) {
-    Token name = _consume(TokenType.IDENTIFIER, "Expect " + kind + " name.")!;
-    _consume(TokenType.LEFT_PAREN, "Expect '(' after " + kind + " name.");
+    Token name = _consume(TokenType.IDENTIFIER, "Expect $kind name.")!;
+    _consume(TokenType.LEFT_PAREN, "Expect '(' after $kind name.");
     List<Token> params = [];
     if (!_check(TokenType.RIGHT_PAREN)) {
       do {
@@ -517,7 +517,7 @@ class Parser {
     List<Expr> arguments = [];
     if (!_check(TokenType.RIGHT_PAREN)) {
       do {
-        if (arguments.length >= Common.MaxFunctionArity) {
+        if (arguments.length >= Common.maxFunctionArity) {
           _errorAt(_peek(), "Too many arguments.");
         }
         arguments.add(_expression());

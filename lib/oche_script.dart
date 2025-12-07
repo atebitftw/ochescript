@@ -124,11 +124,9 @@ Future<Map<String, Object>> _run(
     vm.registerOutCallback((name, value) => outCallback(name, value));
   }
 
-  if (dartFunctionCallback == null) {
-    dartFunctionCallback = (_, _) {
-      throw vm.reportRuntimeError(vm.getCurrentLine(), "dart() function callback is not registered.");
-    };
-  }
+  dartFunctionCallback ??= (_, _) {
+    throw vm.reportRuntimeError(vm.getCurrentLine(), "dart() function callback is not registered.");
+  };
 
   vm.defineNative("dart", (args) {
     if (args.isEmpty) {

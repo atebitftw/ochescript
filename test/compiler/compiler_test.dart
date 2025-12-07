@@ -40,12 +40,12 @@ void main() {
       expect(
         chunk.code,
         containsAllInOrder([
-          OpCode.CONSTANT.index,
+          OpCode.constant.index,
           anything, // index of 1
-          OpCode.CONSTANT.index,
+          OpCode.constant.index,
           anything, // index of 2
-          OpCode.ADD.index,
-          OpCode.POP.index,
+          OpCode.add.index,
+          OpCode.pop.index,
         ]),
       );
     });
@@ -56,13 +56,13 @@ void main() {
       expect(
         chunk.code,
         containsAllInOrder([
-          OpCode.CONSTANT.index,
+          OpCode.constant.index,
           anything,
-          OpCode.DEFINE_GLOBAL.index,
+          OpCode.defineGlobal.index,
           anything,
-          OpCode.GET_GLOBAL.index,
+          OpCode.getGlobal.index,
           anything,
-          OpCode.PRINT.index,
+          OpCode.printOp.index,
         ]),
       );
     });
@@ -85,13 +85,13 @@ void main() {
       expect(
         chunk.code,
         containsAllInOrder([
-          OpCode.CONSTANT.index,
+          OpCode.constant.index,
           anything,
           // No DEFINE_GLOBAL or SET_LOCAL here, just value on stack
-          OpCode.GET_LOCAL.index,
+          OpCode.getLocal.index,
           1, // slot 1 (slot 0 is reserved)
-          OpCode.PRINT.index,
-          OpCode.POP.index, // popping local 'a' at end of block
+          OpCode.printOp.index,
+          OpCode.pop.index, // popping local 'a' at end of block
         ]),
       );
     });
@@ -102,14 +102,14 @@ void main() {
       expect(
         chunk.code,
         containsAllInOrder([
-          OpCode.TRUE.index,
-          OpCode.JUMP_IF_FALSE.index,
+          OpCode.trueOp.index,
+          OpCode.jumpIfFalse.index,
           anything,
           anything,
-          OpCode.POP.index,
-          OpCode.CONSTANT.index,
+          OpCode.pop.index,
+          OpCode.constant.index,
           anything,
-          OpCode.PRINT.index,
+          OpCode.printOp.index,
         ]),
       );
     });

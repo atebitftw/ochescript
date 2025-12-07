@@ -49,7 +49,7 @@ class Chunk {
     if (offset > 0 && lines[offset] == lines[offset - 1]) {
       buffer.write("   | ");
     } else {
-      buffer.write(lines[offset].toString().padLeft(4) + " ");
+      buffer.write("${lines[offset].toString().padLeft(4)} ");
     }
 
     final instruction = code[offset];
@@ -61,38 +61,38 @@ class Chunk {
     final op = OpCode.values[instruction];
 
     switch (op) {
-      case OpCode.CONSTANT:
-      case OpCode.GET_GLOBAL:
-      case OpCode.DEFINE_GLOBAL:
-      case OpCode.SET_GLOBAL:
-      case OpCode.GET_PROPERTY:
-      case OpCode.SET_PROPERTY:
-      case OpCode.GET_SUPER:
-      case OpCode.METHOD:
-      case OpCode.CLASS:
-      case OpCode.OUT:
+      case OpCode.constant:
+      case OpCode.getGlobal:
+      case OpCode.defineGlobal:
+      case OpCode.setGlobal:
+      case OpCode.getProperty:
+      case OpCode.setProperty:
+      case OpCode.getSuper:
+      case OpCode.method:
+      case OpCode.classOp:
+      case OpCode.outOp:
         return _constantInstruction(buffer, op.name, offset);
-      case OpCode.GET_LOCAL:
-      case OpCode.SET_LOCAL:
-      case OpCode.CALL:
-      case OpCode.GET_UPVALUE:
-      case OpCode.SET_UPVALUE:
-      case OpCode.BUILD_LIST:
-      case OpCode.BUILD_MAP:
+      case OpCode.getLocal:
+      case OpCode.setLocal:
+      case OpCode.callOp:
+      case OpCode.getUpValue:
+      case OpCode.setUpValue:
+      case OpCode.buildList:
+      case OpCode.buildMap:
         return _byteInstruction(buffer, op.name, offset);
-      case OpCode.JUMP:
-      case OpCode.JUMP_IF_FALSE:
-      case OpCode.LOOP:
+      case OpCode.jumpOp:
+      case OpCode.jumpIfFalse:
+      case OpCode.loop:
         return _jumpInstruction(
           buffer,
           op.name,
           offset,
           1,
         ); // Jump offsets are usually 2 bytes, but let's assume 1 for now or fix later
-      case OpCode.INVOKE:
-      case OpCode.SUPER_INVOKE:
+      case OpCode.invoke:
+      case OpCode.superInvoke:
         return _invokeInstruction(buffer, op.name, offset);
-      case OpCode.CLOSURE:
+      case OpCode.closure:
         // Closure is complex, treating as constant for now (prototype index)
         return _constantInstruction(buffer, op.name, offset);
       default:
@@ -134,7 +134,7 @@ class Chunk {
   int _invokeInstruction(StringBuffer buffer, String name, int offset) {
     final constant = code[offset + 1];
     final argCount = code[offset + 2];
-    buffer.write("$name (${argCount} args) ${constant.toString().padLeft(4)} '");
+    buffer.write("$name ($argCount args) ${constant.toString().padLeft(4)} '");
     buffer.write(constants[constant]);
     buffer.writeln("'");
     return offset + 3;

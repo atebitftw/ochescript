@@ -13,3 +13,6 @@ Public release.
 
 # 1.0.3
 - Changed [IncludesPreprocesser] to return a `Future<Map<String, String>>` instead of `Map<String, String>`.
+
+# 1.0.4
+- Linter pass.

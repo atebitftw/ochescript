@@ -95,7 +95,7 @@ class VM {
     } on RuntimeError catch (e, stack) {
       _isRunning = false;
       halt = true;
-      Common.log.severe("Runtime Error: $e\n${stack}");
+      Common.log.severe("Runtime Error: $e\n$stack");
       _outState["error"] = e.toString();
       _outState["return_code"] = returnCode > 0 ? returnCode : 1;
 
@@ -103,7 +103,7 @@ class VM {
     } catch (e, stack) {
       _isRunning = false;
       halt = true;
-      Common.log.severe("Unhandled Runtime Exception: ${e}\n${stack}");
+      Common.log.severe("Unhandled Runtime Exception: $e\n$stack");
       _outState["error"] = e.toString();
       _outState["return_code"] = returnCode > 0 ? returnCode : 1;
       return _outState;
@@ -143,39 +143,39 @@ class VM {
 
       // Decode & Execute - inline for performance
       switch (instruction) {
-        case OpCode.CONSTANT:
+        case OpCode.constant:
           final constantIndex = frame.chunk.code[frame.ip++];
           final constant = frame.chunk.constants[constantIndex];
           push(constant);
           break;
 
-        case OpCode.NIL:
+        case OpCode.nil:
           push(null);
           break;
 
-        case OpCode.TRUE:
+        case OpCode.trueOp:
           push(true);
           break;
 
-        case OpCode.FALSE:
+        case OpCode.falseOp:
           push(false);
           break;
 
-        case OpCode.POP:
+        case OpCode.pop:
           pop();
           break;
 
-        case OpCode.GET_LOCAL:
+        case OpCode.getLocal:
           final slot = frame.chunk.code[frame.ip++];
           push(_stack[frame.slots + slot]);
           break;
 
-        case OpCode.SET_LOCAL:
+        case OpCode.setLocal:
           final slot = frame.chunk.code[frame.ip++];
           _stack[frame.slots + slot] = peek(0);
           break;
 
-        case OpCode.INC_LOCAL:
+        case OpCode.incLocal:
           final slot = frame.chunk.code[frame.ip++];
           final val = _stack[frame.slots + slot];
           if (val is num) {
@@ -185,7 +185,7 @@ class VM {
           }
           break;
 
-        case OpCode.DEC_LOCAL:
+        case OpCode.decLocal:
           final slot = frame.chunk.code[frame.ip++];
           final val = _stack[frame.slots + slot];
           if (val is num) {
@@ -195,7 +195,7 @@ class VM {
           }
           break;
 
-        case OpCode.GET_GLOBAL:
+        case OpCode.getGlobal:
           final nameIndex = frame.chunk.code[frame.ip++];
           final name = frame.chunk.constants[nameIndex] as String;
           if (!_globals.containsKey(name)) {
@@ -204,13 +204,13 @@ class VM {
           push(_globals[name]);
           break;
 
-        case OpCode.DEFINE_GLOBAL:
+        case OpCode.defineGlobal:
           final nameIndex = frame.chunk.code[frame.ip++];
           final name = frame.chunk.constants[nameIndex] as String;
           _globals[name] = pop();
           break;
 
-        case OpCode.SET_GLOBAL:
+        case OpCode.setGlobal:
           final nameIndex = frame.chunk.code[frame.ip++];
           final name = frame.chunk.constants[nameIndex] as String;
           if (!_globals.containsKey(name)) {
@@ -219,7 +219,7 @@ class VM {
           _globals[name] = peek(0);
           break;
 
-        case OpCode.GET_UPVALUE:
+        case OpCode.getUpValue:
           final slot = frame.chunk.code[frame.ip++];
           final upvalue = frame.closure.upvalues[slot];
           if (upvalue.isClosed) {
@@ -229,7 +229,7 @@ class VM {
           }
           break;
 
-        case OpCode.SET_UPVALUE:
+        case OpCode.setUpValue:
           final slot = frame.chunk.code[frame.ip++];
           final upvalue = frame.closure.upvalues[slot];
           if (upvalue.isClosed) {
@@ -239,31 +239,31 @@ class VM {
           }
           break;
 
-        case OpCode.EQUAL:
+        case OpCode.equal:
           final b = pop();
           final a = pop();
           push(a == b);
           break;
 
-        case OpCode.NOT_EQUAL:
+        case OpCode.notEqual:
           final b = pop();
           final a = pop();
           push(a != b);
           break;
 
-        case OpCode.GREATER:
+        case OpCode.greater:
           final b = pop() as num;
           final a = pop() as num;
           push(a > b);
           break;
 
-        case OpCode.LESS:
+        case OpCode.less:
           final b = pop() as num;
           final a = pop() as num;
           push(a < b);
           break;
 
-        case OpCode.ADD:
+        case OpCode.add:
           final b = pop();
           final a = pop();
           if (a is num && b is num) {
@@ -288,7 +288,7 @@ class VM {
           }
           break;
 
-        case OpCode.SUBTRACT:
+        case OpCode.subtract:
           final b = pop();
           final a = pop();
           if (a is num && b is num) {
@@ -307,38 +307,38 @@ class VM {
           }
           break;
 
-        case OpCode.MULTIPLY:
+        case OpCode.multiply:
           final b = pop() as num;
           final a = pop() as num;
           push(a * b);
           break;
 
-        case OpCode.DIVIDE:
+        case OpCode.divide:
           final b = pop() as num;
           final a = pop() as num;
           push(a / b);
           break;
 
-        case OpCode.MODULO:
+        case OpCode.modulo:
           final b = pop() as num;
           final a = pop() as num;
           push(a % b);
           break;
 
-        case OpCode.NOT:
+        case OpCode.not:
           push(_isFalsey(pop()));
           break;
 
-        case OpCode.NEGATE:
+        case OpCode.negate:
           final a = pop() as num;
           push(-a);
           break;
 
-        case OpCode.PRINT:
+        case OpCode.printOp:
           print(pop());
           break;
 
-        case OpCode.OUT:
+        case OpCode.outOp:
           final nameIndex = frame.chunk.code[frame.ip++];
           final name = frame.chunk.constants[nameIndex] as String;
           final value = pop();
@@ -352,13 +352,13 @@ class VM {
           }
           break;
 
-        case OpCode.JUMP:
+        case OpCode.jumpOp:
           final offset = (frame.chunk.code[frame.ip] << 8) | frame.chunk.code[frame.ip + 1];
           frame.ip += 2;
           frame.ip += offset;
           break;
 
-        case OpCode.JUMP_IF_FALSE:
+        case OpCode.jumpIfFalse:
           final offset = (frame.chunk.code[frame.ip] << 8) | frame.chunk.code[frame.ip + 1];
           frame.ip += 2;
           if (_isFalsey(peek(0))) {
@@ -366,26 +366,26 @@ class VM {
           }
           break;
 
-        case OpCode.LOOP:
+        case OpCode.loop:
           final offset = (frame.chunk.code[frame.ip] << 8) | frame.chunk.code[frame.ip + 1];
           frame.ip += 2;
           frame.ip -= offset;
           break;
 
-        case OpCode.CALL:
+        case OpCode.callOp:
           final argCount = frame.chunk.code[frame.ip++];
           await _callValue(peek(argCount), argCount);
           frame = _frames.last; // Frame might have changed
           break;
 
-        case OpCode.INVOKE:
+        case OpCode.invoke:
           final method = frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
           final argCount = frame.chunk.code[frame.ip++];
           await _invoke(method, argCount);
           frame = _frames.last; // Frame might have changed
           break;
 
-        case OpCode.SUPER_INVOKE:
+        case OpCode.superInvoke:
           final method = frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
           final argCount = frame.chunk.code[frame.ip++];
           final superclass = pop() as ObjClass;
@@ -393,7 +393,7 @@ class VM {
           frame = _frames.last; // Frame might have changed
           break;
 
-        case OpCode.LIST_APPEND:
+        case OpCode.listAppend:
           final item = peek(0);
           final receiver = peek(1);
           if (receiver is List) {
@@ -407,7 +407,7 @@ class VM {
           }
           break;
 
-        case OpCode.CLOSURE:
+        case OpCode.closure:
           final constantIndex = frame.chunk.code[frame.ip++];
           final function = frame.chunk.constants[constantIndex] as ObjFunction;
 
@@ -425,12 +425,12 @@ class VM {
           push(ObjClosure(function, upvalues));
           break;
 
-        case OpCode.CLOSE_UPVALUE:
+        case OpCode.closeUpValue:
           _closeUpvalues(_sp - 1);
           pop();
           break;
 
-        case OpCode.RETURN:
+        case OpCode.returnOp:
           final result = pop();
           _closeUpvalues(frame.slots);
 
@@ -456,7 +456,7 @@ class VM {
           frame = _frames.last;
           break;
 
-        case OpCode.BUILD_LIST:
+        case OpCode.buildList:
           final count = frame.chunk.code[frame.ip++];
           final list = <dynamic>[];
           for (int i = 0; i < count; i++) {
@@ -465,7 +465,7 @@ class VM {
           push(list);
           break;
 
-        case OpCode.BUILD_MAP:
+        case OpCode.buildMap:
           final count = frame.chunk.code[frame.ip++];
           final map = <String, dynamic>{};
           for (int i = 0; i < count; i++) {
@@ -476,14 +476,15 @@ class VM {
           push(map);
           break;
 
-        case OpCode.INDEX_GET:
+        case OpCode.indexGet:
           final index = pop();
           final target = pop();
 
           if (target is List) {
             if (index is! int) throw reportRuntimeError(getCurrentLine(), "List index must be an integer.");
-            if (index < 0 || index >= target.length)
+            if (index < 0 || index >= target.length) {
               throw reportRuntimeError(getCurrentLine(), "List index out of bounds.");
+            }
             push(target[index]);
           } else if (target is Map) {
             if (index is! String) throw reportRuntimeError(getCurrentLine(), "Map key must be a string.");
@@ -491,23 +492,25 @@ class VM {
             push(target[index]);
           } else if (target is String) {
             if (index is! int) throw reportRuntimeError(getCurrentLine(), "String index must be an integer.");
-            if (index < 0 || index >= target.length)
+            if (index < 0 || index >= target.length) {
               throw reportRuntimeError(getCurrentLine(), "String index out of bounds.");
+            }
             push(target[index]);
           } else {
             throw reportRuntimeError(getCurrentLine(), "Can only index lists, maps, and strings.");
           }
           break;
 
-        case OpCode.INDEX_SET:
+        case OpCode.indexSet:
           final value = pop();
           final index = pop();
           final target = pop();
 
           if (target is List) {
             if (index is! int) throw reportRuntimeError(getCurrentLine(), "List index must be an integer.");
-            if (index < 0 || index >= target.length)
+            if (index < 0 || index >= target.length) {
               throw reportRuntimeError(getCurrentLine(), "List index out of bounds.");
+            }
             target[index] = value;
           } else if (target is Map) {
             if (index is! String) throw reportRuntimeError(getCurrentLine(), "Map key must be a string.");
@@ -518,13 +521,13 @@ class VM {
           push(value); // Assignment expression evaluates to the assigned value
           break;
 
-        case OpCode.CLASS:
+        case OpCode.classOp:
           final nameIndex = frame.chunk.code[frame.ip++];
           final name = frame.chunk.constants[nameIndex] as String;
           push(ObjClass(name));
           break;
 
-        case OpCode.INHERIT:
+        case OpCode.inherit:
           final superclass = peek(0);
           if (superclass is! ObjClass) {
             throw RuntimeError.withLine(getCurrentLine(), "Superclass must be a class.");
@@ -535,7 +538,7 @@ class VM {
           // Don't pop superclass - it stays on stack as the "super" local value
           break;
 
-        case OpCode.METHOD:
+        case OpCode.method:
           final nameIndex = frame.chunk.code[frame.ip++];
           final name = frame.chunk.constants[nameIndex] as String;
           final method = peek(0) as ObjClosure;
@@ -560,7 +563,7 @@ class VM {
           pop(); // Pop method
           break;
 
-        case OpCode.GET_PROPERTY:
+        case OpCode.getProperty:
           final nameIndex = frame.chunk.code[frame.ip++];
           final name = frame.chunk.constants[nameIndex] as String;
           final receiver = peek(0);
@@ -600,7 +603,7 @@ class VM {
             "Only instances have properties. $receiver (${receiver.runtimeType})",
           );
 
-        case OpCode.SET_PROPERTY:
+        case OpCode.setProperty:
           final nameIndex = frame.chunk.code[frame.ip++];
           final name = frame.chunk.constants[nameIndex] as String;
           final value = pop();
@@ -621,7 +624,7 @@ class VM {
             "Only instances have fields. Got ${receiver.runtimeType} instead.",
           );
 
-        case OpCode.GET_SUPER:
+        case OpCode.getSuper:
           final nameIndex = frame.chunk.code[frame.ip++];
           final name = frame.chunk.constants[nameIndex] as String;
           final superValue = pop();
@@ -650,7 +653,7 @@ class VM {
           push(ObjBoundMethod(receiver, method));
           break;
 
-        case OpCode.AWAIT:
+        case OpCode.awaitOp:
           final future = peek(0);
           if (future is Future) {
             final result = await future;
@@ -659,7 +662,7 @@ class VM {
           }
           break;
 
-        case OpCode.IS:
+        case OpCode.isOp:
           final type = pop();
           final value = pop();
           if (type is String) {
@@ -700,7 +703,7 @@ class VM {
           }
           break;
 
-        case OpCode.BIT_AND:
+        case OpCode.bitAnd:
           final b = pop();
           final a = pop();
           if (a is int && b is int) {
@@ -710,7 +713,7 @@ class VM {
           }
           break;
 
-        case OpCode.BIT_OR:
+        case OpCode.bitOr:
           final b = pop();
           final a = pop();
           if (a is int && b is int) {
@@ -720,7 +723,7 @@ class VM {
           }
           break;
 
-        case OpCode.BIT_XOR:
+        case OpCode.bitXor:
           final b = pop();
           final a = pop();
           if (a is int && b is int) {
@@ -730,7 +733,7 @@ class VM {
           }
           break;
 
-        case OpCode.BIT_NOT:
+        case OpCode.bitNot:
           final a = pop();
           if (a is int) {
             push(~a);
@@ -739,7 +742,7 @@ class VM {
           }
           break;
 
-        case OpCode.SHIFT_LEFT:
+        case OpCode.shiftLeft:
           final b = pop();
           final a = pop();
           if (a is int && b is int) {
@@ -749,7 +752,7 @@ class VM {
           }
           break;
 
-        case OpCode.SHIFT_RIGHT:
+        case OpCode.shiftRight:
           final b = pop();
           final a = pop();
           if (a is int && b is int) {

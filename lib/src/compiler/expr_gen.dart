@@ -92,8 +92,6 @@ class Variable extends Expr {
   final Token name;
   Object? cachedValue;
   int cachedVersion = -1;
-  // ignore: prefer_typing_uninitialized_variables
-  var cachedEnv;
 
   @override
   R accept<R>(ExprVisitor<R> visitor) {

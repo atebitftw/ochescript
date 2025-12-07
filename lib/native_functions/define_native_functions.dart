@@ -1,4 +1,4 @@
-import 'dart:convert' as JSON;
+import 'dart:convert' as json;
 import 'dart:math';
 
 import 'package:oche_script/oche_script.dart' show RuntimeError;
@@ -33,7 +33,7 @@ void defineVmNativeFunctions(VM vm) {
 /// var duration = end - start;
 /// print("Elapsed: $duration ms.");
 /// ```
-final Function clock = (args) => DateTime.now().millisecondsSinceEpoch;
+int clock(List args) => DateTime.now().millisecondsSinceEpoch;
 
 /// Provides a now() function that returns the current time.
 ///
@@ -43,7 +43,7 @@ final Function clock = (args) => DateTime.now().millisecondsSinceEpoch;
 /// var now = now();
 /// print("Current time: $now");
 /// ```
-final Function now = (args) => DateTime.now();
+DateTime now(List args) => DateTime.now();
 
 /// Provides a date() function that creates a DateTime object from the given arguments.
 ///
@@ -55,7 +55,7 @@ final Function now = (args) => DateTime.now();
 /// var date = date(2025, 12, 5, 13, 18, 39, 0);
 /// print("Current time: $date");
 /// ```
-final Function date = (args) {
+DateTime date(List args) {
   _arityCheck(7, args.length);
   _numberTypeCheck(args[0]);
   _numberTypeCheck(args[1]);
@@ -74,7 +74,7 @@ final Function date = (args) {
     args[6] as int,
     0,
   );
-};
+}
 
 /// Provides a duration() function that creates a Duration object from the given arguments.
 ///
@@ -86,7 +86,7 @@ final Function date = (args) {
 /// var duration = duration(0, 0, 0, 0, 1000);
 /// print("Duration: $duration");
 /// ```
-final Function duration = (args) {
+Duration duration(List args) {
   _arityCheck(5, args.length);
   _numberTypeCheck(args[0]);
   _numberTypeCheck(args[1]);
@@ -100,7 +100,7 @@ final Function duration = (args) {
     hours: args[3] as int,
     days: args[4] as int,
   );
-};
+}
 
 /// Provides a parseDateTime() function that parses a date string to a DateTime object.
 ///
@@ -113,7 +113,7 @@ final Function duration = (args) {
 /// print(date is DateTime); // true
 /// print("Date: $date");
 /// ```
-final Function parseDateTime = (args) {
+DateTime parseDateTime(List args) {
   _arityCheck(1, args.length);
   _stringTypeCheck(args[0]);
   try {
@@ -121,7 +121,7 @@ final Function parseDateTime = (args) {
   } catch (_) {
     throw RuntimeError("parseDateTime: Invalid date string: ${args[0]}");
   }
-};
+}
 
 void _defineVmTimeFunctions(VM vm) {
   vm.defineNative("clock", clock);
@@ -141,12 +141,12 @@ void _defineVmTimeFunctions(VM vm) {
 /// var future = wait(1000);
 /// print("Future completed after 1 second.");
 /// ```
-final Function wait = (args) {
+Future wait(List args) {
   _arityCheck(1, args.length);
   _numberTypeCheck(args[0]);
   final ms = args[0] as num;
   return Future.delayed(Duration(milliseconds: ms.toInt()), () => ms);
-};
+}
 
 /// Provides a quit() function that immediately halts script execution and exits
 /// with the given return code.
@@ -184,14 +184,13 @@ void _defineVmSystemFunctions(VM vm) {
 /// print(json is String); // true
 /// print("JSON: $json");
 /// ```
-final Function jsonEncode = (args) {
+String jsonEncode(List args) {
   if (args[0] is! Map) {
     throw RuntimeError("jsonEncode: Expected a map object, but got ${args[0].runtimeType}");
   }
 
   _arityCheck(1, args.length);
-
-  return JSON.jsonEncode(
+  return json.jsonEncode(
     args[0],
     toEncodable: (object) {
       if (object is DateTime) {
@@ -200,7 +199,7 @@ final Function jsonEncode = (args) {
       return object;
     },
   );
-};
+}
 
 /// Provides a jsonDecode() function that decodes a JSON string to a map object.
 /// Supports conversion of DateTime objects from strings.
@@ -214,10 +213,14 @@ final Function jsonEncode = (args) {
 /// print(json is Map); // true
 /// print("JSON: $json");
 /// ```
-final Function jsonDecode = (args) {
+Map<String, dynamic> jsonDecode(List args) {
   _arityCheck(1, args.length);
-  return JSON.jsonDecode(
-    args[0],
+  if (args[0] is! String) {
+    throw RuntimeError("jsonDecode: Expected a string, but got ${args[0].runtimeType}");
+  }
+
+  return json.jsonDecode(
+    args[0] as String,
     reviver: (key, value) {
       if (value is String) {
         try {
@@ -230,7 +233,7 @@ final Function jsonDecode = (args) {
       }
     },
   );
-};
+}
 
 void _defineVmConvertFunctions(VM vm) {
   vm.defineNative("jsonEncode", jsonEncode);
@@ -248,10 +251,10 @@ void _defineVmConvertFunctions(VM vm) {
 /// print(random is Num); // true
 /// print("Random: $random");
 /// ```
-final Function rndDouble = (args) {
+double rndDouble(List args) {
   _arityCheck(0, args.length);
   return _random.nextDouble();
-};
+}
 
 /// Provides a rndInt() function that returns a random integer value.
 ///
@@ -264,17 +267,17 @@ final Function rndDouble = (args) {
 /// print(random is Num); // true
 /// print("Random: $random");
 /// ```
-final Function rndInt = (args) {
+int rndInt(List args) {
   _arityCheck(1, args.length);
   _numberTypeCheck(args[0]);
   final num value = args[0] as num;
   return _random.nextInt(value.toInt());
-};
+}
 
-final Function rndBool = (args) {
+bool rndBool(List args) {
   _arityCheck(0, args.length);
   return _random.nextBool();
-};
+}
 
 void _defineVmMathFunctions(VM vm) {
   vm.defineNative("rndDouble", rndDouble);

@@ -2,193 +2,193 @@
 enum OpCode {
   /// Load a constant value from the chunk's constant pool.
   /// Operand: 1 byte index into the constant pool.
-  CONSTANT,
+  constant,
 
   /// Load null onto the stack.
-  NIL,
+  nil,
 
   /// Load true onto the stack.
-  TRUE,
+  trueOp,
 
   /// Load false onto the stack.
-  FALSE,
+  falseOp,
 
   /// Pop the top value from the stack.
-  POP,
+  pop,
 
   /// Get a local variable.
   /// Operand: 1 byte stack slot index.
-  GET_LOCAL,
+  getLocal,
 
   /// Set a local variable.
   /// Operand: 1 byte stack slot index.
-  SET_LOCAL,
+  setLocal,
 
   /// Get a global variable.
   /// Operand: 1 byte index into the constant pool (variable name).
-  GET_GLOBAL,
+  getGlobal,
 
   /// Set a global variable.
   /// Operand: 1 byte index into the constant pool (variable name).
-  DEFINE_GLOBAL,
+  defineGlobal,
 
   /// Set a global variable.
   /// Operand: 1 byte index into the constant pool (variable name).
-  SET_GLOBAL,
+  setGlobal,
 
   /// Get an upvalue (captured variable).
   /// Operand: 1 byte upvalue index.
-  GET_UPVALUE,
+  getUpValue,
 
   /// Set an upvalue (captured variable).
   /// Operand: 1 byte upvalue index.
-  SET_UPVALUE,
+  setUpValue,
 
   /// Read a property from an instance.
   /// Operand: 1 byte index into the constant pool (property name).
-  GET_PROPERTY,
+  getProperty,
 
   /// Set a property on an instance.
   /// Operand: 1 byte index into the constant pool (property name).
-  SET_PROPERTY,
+  setProperty,
 
   /// Get the superclass method.
   /// Operand: 1 byte index into the constant pool (method name).
-  GET_SUPER,
+  getSuper,
 
   /// Binary equality operator (==).
-  EQUAL,
+  equal,
 
   /// Binary inequality operator (!=).
-  NOT_EQUAL,
+  notEqual,
 
   /// Optimization for list.add(item).
-  LIST_APPEND,
+  listAppend,
 
   /// Binary greater than operator (>).
-  GREATER,
+  greater,
 
   /// Binary less than operator (<).
-  LESS,
+  less,
 
   /// Binary addition operator (+).
-  ADD,
+  add,
 
   /// Binary subtraction operator (-).
-  SUBTRACT,
+  subtract,
 
   /// Binary multiplication operator (*).
-  MULTIPLY,
+  multiply,
 
   /// Binary division operator (/).
-  DIVIDE,
+  divide,
 
   /// Binary modulo operator (%).
-  MODULO,
+  modulo,
 
   /// Unary not operator (!).
-  NOT,
+  not,
 
   /// Unary negation operator (-).
-  NEGATE,
+  negate,
 
   /// Bitwise AND (&).
-  BIT_AND,
+  bitAnd,
 
   /// Bitwise OR (|).
-  BIT_OR,
+  bitOr,
 
   /// Bitwise XOR (^).
-  BIT_XOR,
+  bitXor,
 
   /// Bitwise NOT (~).
-  BIT_NOT,
+  bitNot,
 
   /// Bitwise Shift Left (<<).
-  SHIFT_LEFT,
+  shiftLeft,
 
   /// Bitwise Shift Right (>>).
-  SHIFT_RIGHT,
+  shiftRight,
 
   /// Print the top value of the stack.
-  PRINT,
+  printOp,
 
   /// Output the top value of the stack to the external environment.
   /// Operand: 1 byte index into the constant pool (output name).
-  OUT,
+  outOp,
 
   /// Jump unconditionally.
   /// Operand: 2 byte offset.
-  JUMP,
+  jumpOp,
 
   /// Jump if the top value of the stack is false.
   /// Operand: 2 byte offset.
-  JUMP_IF_FALSE,
+  jumpIfFalse,
 
   /// Loop back to a previous instruction.
   /// Operand: 2 byte offset.
-  LOOP,
+  loop,
 
   /// Call a function.
   /// Operand: 1 byte argument count.
-  CALL,
+  callOp,
 
   /// Invoke a method.
   /// Operand: 1 byte index into the constant pool (method name).
   /// Operand: 1 byte argument count.
-  INVOKE,
+  invoke,
 
   /// Invoke a superclass method.
   /// Operand: 1 byte index into the constant pool (method name).
   /// Operand: 1 byte argument count.
-  SUPER_INVOKE,
+  superInvoke,
 
   /// Create a closure.
   /// Operand: 1 byte index into the constant pool (function prototype).
-  CLOSURE,
+  closure,
 
   /// Close upvalues (used when returning from a function or scope).
-  CLOSE_UPVALUE,
+  closeUpValue,
 
   /// Return from a function.
-  RETURN,
+  returnOp,
 
   /// Create a class.
   /// Operand: 1 byte index into the constant pool (class name).
-  CLASS,
+  classOp,
 
   /// Inherit from a superclass.
-  INHERIT,
+  inherit,
 
   /// Define a method in a class.
   /// Operand: 1 byte index into the constant pool (method name).
-  METHOD,
+  method,
 
   /// Await a Future.
-  AWAIT,
+  awaitOp,
 
   /// Create a list.
   /// Operand: 1 byte element count.
-  BUILD_LIST,
+  buildList,
 
   /// Create a map.
   /// Operand: 1 byte entry count (key-value pairs).
-  BUILD_MAP,
+  buildMap,
 
   /// Get a value from a list or map by index/key.
-  INDEX_GET,
+  indexGet,
 
   /// Set a value in a list or map by index/key.
-  INDEX_SET,
+  indexSet,
 
   /// Type check (is).
-  IS,
+  isOp,
 
   /// Increment a local variable in place (pushes nothing).
   /// Operand: 1 byte stack slot index.
-  INC_LOCAL,
+  incLocal,
 
   /// Decrement a local variable in place (pushes nothing).
   /// Operand: 1 byte stack slot index.
-  DEC_LOCAL,
+  decLocal,
 }

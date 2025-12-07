@@ -35,7 +35,7 @@ void main() {
 
       test('jsonDecode() decodes strings', () async {
         // Use jsonEncode to create the JSON string to avoid escaping issues
-        final result = await run('''
+        final result = await run(r'''
           var obj = {"key": "value"};
           var str = jsonEncode(obj);
           var decoded = jsonDecode(str);

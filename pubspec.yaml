@@ -1,5 +1,5 @@
 name: oche_script
-version: 1.0.3
+version: 1.0.4
 description: OcheScript embeddable script language for Flutter/Dart applications.
 homepage: https://atebitftw.github.io/site/
 repository: https://github.com/atebitftw/ochescript
@@ -24,5 +24,6 @@ dependencies:
   meta: ^1.17.0
 dev_dependencies:
   test: ^1.28.0
+  lints: ^6.0.0
 environment:
   sdk: ^3.10.3
