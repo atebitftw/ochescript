@@ -10,9 +10,7 @@ If you use **Flutter** ([flutter.dev](https://flutter.dev)), then you already ha
 Reference This Package In Your pubspec.yaml file.
 ```yaml
 dependencies:
-  oche_script:
-    git:
-      url: git@github.com:atebitftw/oche_script.git
+  oche_script: ^1.0.2
 ```
 
 In your dart code, you can use it like this:

@@ -7,3 +7,6 @@ Public release.
 # 1.0.1
 - Updated dartdocs
 - Updated README.md
+
+# 1.0.2
+- Fixed documentation.
