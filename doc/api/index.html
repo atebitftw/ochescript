@@ -63,13 +63,13 @@
 <p>I work on some very large-scale Flutter projects that sometimes require a bit of dynamic runtime automation, and I found that I needed execute arbitrary code at runtime in certain situations.  I built OcheScript to meet this need.  In the Flutter/Dart ecosystem, there are probably five people that need this kind of thing, and I am one of them.  To the other four, I say: "Hello World!".</p>
 <p><em>Side Note: Dart technically does have arbitrary code execution capability via <code>dart:mirrors</code>, but I personally do not consider it to be a viable approach for many production application scenarios, especially anything Flutter-based (mirrors disallowed).  Another reason to avoid mirrors: As soon as you bring in mirrors, you lose tree-shaking.</em></p>
 <h2 id="getting-started">Getting Started</h2>
-<p>See the <a href="lib/doc/getting_started.md">Getting Started</a> document for more information.</p>
+<p>See the <a href="https://github.com/atebitftw/ochescript/blob/main/doc/getting_started.md">Getting Started</a> document for more information.</p>
 <h2 id="language-specification">Language Specification</h2>
-<p>See the <a href="lib/doc/language_specification.md">Language Specification</a> document for more information.</p>
+<p>See the <a href="https://github.com/atebitftw/ochescript/blob/main/doc/language_specification.md">Language Specification</a> document for more information.</p>
 <h2 id="library-api">Library API</h2>
-<p>See the <a href="lib/doc/api">API</a> document for more information.  This is an HTML document generated from the Dartdoc comments in the source code.</p>
+<p>See the <a href="https://github.com/atebitftw/ochescript/tree/main/doc/api">API</a> document for more information.  This is an HTML document generated from the Dartdoc comments in the source code.</p>
 <h2 id="dart-interop">Dart Interop</h2>
-<p>See the <a href="lib/doc/dart_interop.md">Dart Interop</a> document for more information.</p>
+<p>See the <a href="https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md">Dart Interop</a> document for more information.</p>
 <h2 id="error-handling">Error Handling</h2>
 <p>Runtime errors cause script execution to halt with an error message.</p>
 <p>Errors are not emitted to stdout by default.  They are usually reported via the <a href="https://pub.dev/packages/logging">Logging Package</a> at level WARNING and above.  To listen to these errors, you can use the <code>Logging</code> class from the <code>logging</code> package.</p>
@@ -134,7 +134,8 @@ Future&lt;void&gt; main() async {
 <li>I'm open to other ideas.</li>
 </ul>
 <h2 id="syntax-highlighting-support-in-vscode">Syntax Highlighting Support in VSCode</h2>
-<p>In <a href="https://github.com/atebitftw/oche_script/tree/main/tool/vs_code_syntax_highlighter/ochescript">VS Code Extension</a> there is a a VSCode extension project that provides basic syntax highlighting for OcheScript files (.oche). You can use this extension by importing the <code>.vsix</code> file into VSCode manually.</p>
+<p>In <a href="https://github.com/atebitftw/ochescript/tree/main/tool/vs_code_syntax_highlighter/ochescript">VS Code Extension</a> there is a a VSCode extension project that provides basic syntax highlighting for OcheScript files (.oche). You can use this extension by importing the <code>.vsix</code> file into VSCode manually.</p>
+<p>You can find the compiled .vsix extension file in the bin/ directory of this project: <a href="https://github.com/atebitftw/ochescript/tree/main/bin">here</a></p>
 <h2 id="about-me">About Me</h2>
 <p>My name is John, and if you've been a Dart enthusiast prior to M1 (way before v1 release), then we are probably friends.</p>
 <h2 id="attributions-and-gratitude">Attributions and Gratitude</h2>
@@ -245,7 +246,7 @@ Future&lt;void&gt; main() async {
 <footer>
   <span class="no-break">
     oche_script
-      1.0.0
+      1.0.0+2
   </span>
   
 </footer>
