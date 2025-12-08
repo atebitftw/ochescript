@@ -21,6 +21,8 @@ pubspec.lock
 *.js.deps
 *.js.map
 
+scratch.oche
+
 .flutter-plugins
 .flutter-plugins-dependencies
 
