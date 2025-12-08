@@ -26,6 +26,7 @@ OcheScript is a dynamically-typed, interpreted scripting language designed for e
 - [Native Functions](#native-functions)
 - [Dart Interop](#dart-interop)
 - [Directives](#directives)
+- [Runtime Stack Size Limits](#runtime-stack-size-limits)
 
 ## Entry
 [Back To Table Of Contents](#table-of-contents)
@@ -970,7 +971,9 @@ Using include directives is a compile-time preprocessor operation, and is platfo
 
 See [Windows Example](http://github.com/atebitftw/ochescript/blob/main/lib/windows_preprocessor.dart).
 
-## Stack Size Limits
+## Runtime Stack Size Limits
+[Back To Table Of Contents](#table-of-contents)
+
 Since the scope of this language is to live embedded inside other Dart applications, the virtual machine stack is fixed to a size of 8192 elements.  This is to prevent memory exhaustion in the host Dart environment.  If the stack overflows, the virtual machine will throw a runtime error.
 
 Most scripts will rarely come close to this limit (most will never exceed 100).  However there are some rare scenarios that could cause a stack overflow:
@@ -982,4 +985,4 @@ Most scripts will rarely come close to this limit (most will never exceed 100). 
 ```js
 var x = [1, 2, 3, ..., 8192]; // are you really declaring 8192 static elements in a list??
 ```
-This will cause a stack overflow because the compiler pushes each element of the list onto the stack before actually building the list.  Better to define the list dynamically (e.g. `var x = []; for (var i = 0; i < 10000; i++) x.add(i);`) as this only pushes one element onto the stack at a time.
+This will cause a stack overflow because the compiler design pushes each element of the list onto the stack before actually building the list.  Better to define the list dynamically (e.g. `var x = []; for (var i = 0; i < 10000; i++) x.add(i);`) as this only pushes one element onto the stack at a time.
