@@ -25,3 +25,6 @@ Public release.
 
 # 1.0.7
 - Dart CI workflow and badge.
+
+# 1.1.0
+- Added try/catch feature.
