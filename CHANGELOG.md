@@ -22,3 +22,6 @@ Public release.
 
 # 1.0.6
 - Linter pass.
+
+# 1.0.7
+- Dart CI workflow and badge.

@@ -3,6 +3,7 @@
 **Oche *(pronounced "ock-ee")*. The official name for the throwing line in a game of darts.**
 
 Embedded script language for Flutter/Dart applications.
+[![Dart CI](https://github.com/atebitftw/ochescript/actions/workflows/dart.yaml/badge.svg)](https://github.com/atebitftw/ochescript/actions/workflows/dart.yaml)
 
 ![OcheScript Logo](https://atebitftw.github.io/site/assets/oche_script_logo_640.png)
 
