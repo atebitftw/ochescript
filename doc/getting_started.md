@@ -29,7 +29,7 @@ Future<void> main() async {
 ## CLI Installation
 You can install a simple script runner utility locally by running:
 ```bash
-dart pub global activate --source git git@github.com:atebitftw/oche_script.git
+dart pub global activate oche_script
 ```
 
 This will install the `oche` command globally, which you can use to run scripts.
