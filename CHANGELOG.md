@@ -28,3 +28,6 @@ Public release.
 
 # 1.1.0
 - Added try/catch feature.
+
+# 1.1.1
+- Enchanced documentation.

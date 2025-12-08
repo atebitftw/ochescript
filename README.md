@@ -1,40 +1,39 @@
 # OcheScript
-
-**Oche *(pronounced "ock-ee")*. The official name for the throwing line in a game of darts.**
-
-Embedded script language for Flutter/Dart applications.
-
 [![Dart CI](https://github.com/atebitftw/ochescript/actions/workflows/dart.yaml/badge.svg)](https://github.com/atebitftw/ochescript/actions/workflows/dart.yaml)
 
 ![OcheScript Logo](https://atebitftw.github.io/site/assets/oche_script_logo_640.png)
+*Oche *(pronounced "ock-ee")*. The official name for the throwing line in a game of darts.*
+
+#### Embedded script language for Flutter/Dart applications.
 
 ## Key Features
-OcheScript is a lightweight, dynamically typed, object-oriented, scripting language designed for embedding into Dart applications.
+OcheScript is an extensible, lightweight yet powerful scripting language designed for embedding into Dart/Flutter applications.
 
-*   Convenient Dart interop capabilities.
-*   Extensible via native methods and functions.
-*   Object-oriented programming features (classes, methods, properties, etc.).
-*   Closures and lambdas.
-*   (Limited) Asynchronous support (async/await).
-*   String interpolation.
-*   Try/catch exception handling.
-*   Lightweight preprocessor directive capabilities.
-*   `.oche` script file syntax highlighting extension for VSCode/Antigravity.
+*   **Convenient [Dart interop](https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md) Features.**
+    * **Initialize OcheScript globals from Dart.**
+    * **Call Dart functions from OcheScript and get return values.**
+    * **Send values from OcheScript to Dart at any time.**
+*   **Extensible - Make It Your Own**
+    * **Define [extension methods](https://github.com/atebitftw/ochescript/blob/main/doc/native_methods.md) bound to supported types (many already included).**
+    * **Define [global functions](https://github.com/atebitftw/ochescript/blob/main/doc/native_functions.md) that can execute arbitrary Dart code (many already included).**
+*   **Object-Oriented Programming Features (classes, methods, properties, etc.).**
+*   **Closures and Lambdas.**
+*   **String Interpolation.**
+*   **Try/Catch Exception Handling.**
+*   **Asynchronous Support (async/await).**
+*   **Lightweight Preprocessor Directive Capabilities.**
+*   **`.oche` Script File Syntax Highlighting Extension for VSCode/Antigravity.**
+*   **Comprehensive API and Language Documentation.**
 
 ## Hello World In OcheScript
-*In a text file with extension `.oche`*
-```js
-print("Hello World!");
-```
-
-Running from Dart:
-
 ```dart
 import 'package:oche_script/oche_script.dart' as oche;
 
 Future<void> main() async {
   final result = await oche.compileAndRun(r"print("Hello World!");");
 }
+
+// Hello World!
 ```
 
 ## Getting Started
@@ -44,7 +43,7 @@ See the [Getting Started](https://github.com/atebitftw/ochescript/blob/main/doc/
 See the [Language Specification](https://github.com/atebitftw/ochescript/blob/main/doc/language_specification.md) document for more information.
 
 ## Library API
-See the [API](https://github.com/atebitftw/ochescript/tree/main/doc/api) document for more information.  This is an HTML document generated from the Dartdoc comments in the source code.
+See the [API](https://pub.dev/documentation/oche_script/latest/) document for more information.  This is an HTML document generated from the Dartdoc comments in the source code.
 
 ## Dart Interop
 See the [Dart Interop](https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md) document for more information.
@@ -53,56 +52,6 @@ See the [Dart Interop](https://github.com/atebitftw/ochescript/blob/main/doc/dar
 I work on some very large-scale Flutter projects that sometimes require a bit of dynamic runtime automation, and I found that I needed execute arbitrary code at runtime in certain situations.  I built OcheScript to meet this need.  In the Flutter/Dart ecosystem, there are probably five people that need this kind of thing, and I am one of them.  To the other four, I say: "Hello World!".
 
 *Side Note: Dart technically does have arbitrary code execution capability via `dart:mirrors`, but I personally do not consider it to be a viable approach for many production application scenarios, especially anything Flutter-based (mirrors disallowed).  Another reason to avoid mirrors: As soon as you bring in mirrors, you lose tree-shaking.*
-
-## Error Handling
-Unless captured in a `try/catch` block, runtime errors cause script execution to halt with an error message.
-
-Errors are not emitted to stdout by default.  They are usually reported via the [Logging Package](https://pub.dev/packages/logging) at level WARNING and above.  To listen to these errors, you can use the `Logging` class from the `logging` package.
-
-```dart
-// (assumes you've added the logging package as a dependency in your pubspec.yaml)
-import 'package:logging/logging.dart';
-import 'package:oche_script/oche_script.dart' as oche;
-
-Future<void> main() async {
-  Logger.root.level = Level.WARNING;
-  Logger.root.onRecord.listen((record) {
-    print("${record.level.name}: ${record.message}");
-    // emits the error message and stack trace
-  });
-
-  final result = await oche.compileAndRun(r"print("Hello World!");");
-
-  print("Return Code: ${result['return_code']}");
-  if (result.containsKey('error')) {
-    print("Error: ${result['error']}");
-  }
-}
-```
-
-Error messages are also placed in the return map of the `compileAndRun` function (without stack trace).  The map has the following structure:
-
-```dart
-{
-  "error": "{error message}",
-  "return_code": 1,
-  // other stuff emitted by any out() functions in the script.
-}
-```
-
-### Why not just print errors to stdout?
-Since OcheScript is primarily designed for use as an embedded language in other Dart/Flutter applications, stdout is not reliably available on various platforms.  Using the logging package gives the developer more flexibility in how and where they receive error messages.
-
-If you want the error message to be printed to stdout, you can use the `Logging` class from the `logging` package to listen to the `Logger` at level WARNING and above.
-
-### Included Library Error Reporting
-When using the `#include` directive to include other "library" files into your script, OcheScript tracks the original source file and line number.  If a runtime error occurs within an included file, the error message will be prefixed with the file name and line number, like so:
-
-```
-Runtime error: [my_lib:42] Undefined variable 'foo'.
-```
-
-This is useful for debugging scripts that are composed of multiple files.
 
 ## These Batteries Are Not Included
 *   No module system (beyond `#INCLUDE` directive)

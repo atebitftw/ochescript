@@ -1,8 +1,52 @@
-# OcheScript Language Overview
+# OcheScript Specification
 
-OcheScript is a dynamically-typed, interpreted scripting language designed for embedding in Dart applications. It is written in Dart, and features a familiar C-style-ish syntax, first-class functions, classes with inheritance, and helpful Dart interop capabilities.
+*This document is not intended to be a classical computer science language specification.  It's meant to be a practical guide of the language features and capabilities.*
+
+OcheScript is a dynamically-typed, interpreted scripting language designed for embedding in Dart applications. It is written in Dart, and features a familiar Dart-ish syntax, first-class functions, classes with inheritance, and helpful Dart interop capabilities.
+
+# Table Of Contents
+- [Entry](#entry)
+- [Comments](#comments)
+- [Reserved Keywords](#reserved-keywords)
+- [Supported Types](#supported-types)
+  - [Table Of Supported Types](#table-of-supported-types)
+  - [Reference Types](#reference-types)
+  - [About Null](#about-null)
+- [Variables](#variables)
+- [Operators](#operators)
+- [Control Flow](#control-flow)
+  - [If/Else](#if-else)
+  - [Switch](#switch)
+  - [Loops (for, while, for-in)](#loops)
+- [Functions](#functions)
+- [Classes](#classes)
+- [Exception Handling (try/catch)](#exception-handling)
+- [Async/Await](#async--await)
+- [Native Methods](#native-methods)
+- [Native Functions](#native-functions)
+- [Dart Interop](#dart-interop)
+- [Directives](#directives)
+
+## Entry
+[Back To Table Of Contents](#table-of-contents)
+
+OcheScript doesn't define a canonical entry point.
+
+Code is executed at the top-level of the script wherever it is found.  However, it is recommended to place your code in a function and call it at the top-level.
+
+```js
+// declaring the entry function
+fun main(){
+    print("Hello, World!");
+}
+
+// invoking the entry function
+main();
+```
 
 ## Comments
+[Back To Table Of Contents](#table-of-contents)
+
 OcheScript supports single-line comments.
 ```js
 // This is a comment
@@ -10,6 +54,8 @@ var x = 1; // Comment at end of line
 ```
 
 ## Reserved Keywords
+[Back To Table Of Contents](#table-of-contents)
+
 The following words are reserved (case-sensitive):
 *   `class`
 *   `super`
@@ -74,9 +120,12 @@ Not reserved in the language definition sense, these words are still reserved du
 *   `rndBool`
 
 
-## Data Types
+## Supported Types
+[Back To Table Of Contents](#table-of-contents)
+
 The language is dynamically typed but supports runtime type checking.
 
+### Table Of Supported Types
 | Type | Description | Example |
 |------|-------------|---------|
 | `Num` | Numeric values (integers and floats) | `42`, `3.14`, `0xFF` |
@@ -86,9 +135,25 @@ The language is dynamically typed but supports runtime type checking.
 | `Map` | Key-value pairs (keys must be strings) | `{"key": value}` |
 | `Date` | Timestamp values | `now()`, `date(2022, 1, 1, 0, 0, 0, 0)` |
 | `Duration` | Time span values | `now() - start` |
-| `{class instance}` | User-defined classes |  |
+| `{class instance}` | User-defined classes | `var x = Dog();` |
 
-### Null (nullity) is not a supported concept in OcheScript.
+### Reference Types
+Reference types to functions and classes are also supported.  However, these are not defined as types in the language, but rather as values that can be assigned to variables.
+
+```js
+fun main(){
+    print("hi");
+}
+
+// x now is a reference to the main function.
+var x = main;
+
+x();
+```
+### About Null
+
+Null (nullity) is not a supported concept in OcheScript.
+
 While it is possible to assign a "null" to a variable (see below), if you try to use that variable as a value, it will throw an error.
 
 ```js
@@ -133,6 +198,7 @@ switch(x.isEmpty()){
 ```
 
 ## String Interpolation
+[Back To Table Of Contents](#table-of-contents)
 
 Strings support interpolation using `$` for variables and `${}` for expressions.
 
@@ -146,6 +212,7 @@ print("Sum: ${a + b}"); // "Sum: 30"
 ```
 
 ## Variables
+[Back To Table Of Contents](#table-of-contents)
 
 Variables are declared using the `var` keyword. Initialization is mandatory.
 
@@ -194,19 +261,52 @@ print(x); // 123
 ```
 
 ## Operators
+[Back To Table Of Contents](#table-of-contents)
 
 ### Arithmetic
-`+`, `-`, `*`, `/`, `%` (modulo), `++` (increment), `--` (decrement).
-Note: `+` is also used for string concatenation.
+- `+`
+- `-`
+- `*`
+- `/`
+- `%` (modulo)
+- `++` (increment)
+- `--` (decrement)
+
+#### `+` Overloading
+The `+` operator is overloaded for several types:
+- `Num + Num` (addition)
+- `String + String` (concatenation, prefer interpolation)
+- `List + List` (concatenation)
+- `Map + Map` (merge)
+- `Date + Duration` (addition)
+- `Duration + Duration` (addition)
+
+#### `-` Overloading
+The `-` operator is overloaded for several types:
+- `Num - Num` (subtraction)
+- `Date - Date` (subtraction)
+- `Duration - Duration` (subtraction)
 
 ### Comparison
-`==`, `!=`, `<`, `<=`, `>`, `>=`.
+- `==`
+- `!=`
+- `<`
+- `<=`
+- `>`
+- `>=`
 
 ### Logical
-`&&` (AND), `||` (OR), `!` (NOT).
+- `&&` (AND)
+- `||` (OR)
+- `!` (NOT)
 
 ### Bitwise
-`&` (AND), `|` (OR), `^` (XOR), `~` (NOT), `<<` (Left Shift), `>>` (Right Shift).
+- `&` (AND)
+- `|` (OR)
+- `^` (XOR)
+- `~` (NOT)
+- `<<` (Left Shift)
+- `>>` (Right Shift)
 
 ### Type Checking
 The `is` operator checks if an object is of a specific type.
@@ -241,6 +341,7 @@ print(x is Cat); // false
 ```
 
 ## Control Flow
+[Back To Table Of Contents](#table-of-contents)
 
 ### If-Else
 
@@ -251,6 +352,42 @@ if (condition) {
   // do something else
 } else {
   // do something else
+}
+```
+
+### Switch
+
+```js
+var x = 100;
+
+switch(x){
+    case 1:
+        print("x is 1");
+        break;
+    case 2:
+        print("x is 2");
+        break;
+    case 100:
+        print("x is 100");
+        break;
+    default:
+        print("x is not 1 or 2 or 100");
+}
+
+switch(x) {
+  case 2 * 50:
+    print("x is still 100. Even when using expressions in the case statement.");
+    break;
+  default:
+    print("x is not 100");
+}
+
+switch(x < 50){
+  case true:
+    print("x is less than 50.");
+    break;
+  default:
+    print("x is not less than 50.");
 }
 ```
 
@@ -295,48 +432,54 @@ for (var item in funcList) {
 ```
 
 **Control Statements**
-- `break`: Exits the current loop immediately.
+- `break`: Exits the current loop immediately.  Also used in switch statements.
 - `continue`: Skips the rest of the current iteration.
 
-### Switch
-
-```js
-var x = 100;
-
-switch(x){
-    case 1:
-        print("x is 1");
-        break;
-    case 2:
-        print("x is 2");
-        break;
-    case 100:
-        print("x is 100");
-        break;
-    default:
-        print("x is not 1 or 2 or 100");
-}
-
-switch(x) {
-  case 2 * 50:
-    print("x is still 100. Even when using expressions in the case statement.");
-    break;
-  default:
-    print("x is not 100");
-}
-
-switch(x < 50){
-  case true:
-    print("x is less than 50.");
-    break;
-  default:
-    print("x is not less than 50.");
-}
-```
-
 ## Functions
+[Back To Main Table Of Contents](#table-of-contents)
+
+### Functions Table Of Contents
+
+- [Function Declaration Order](#function-declaration-order)
+- [Named Functions](#named-functions)
+- [Anonymous Functions (Lambdas)](#anonymous-functions-lambdas)
+- [Nesting](#nesting)
+- [Returning Functions](#returning-functions)
+- [Assigning Functions To Variables](#assigning-functions-to-variables)
+- [Recursion](#recursion)
+- [Private Classes In Functions](#private-classes-in-functions)
 
 Functions are first-class citizens. They can be declared named or anonymous.
+
+### Function Declaration Order
+Functions must be declared before they are invoked.
+
+This will throw a runtime error:
+```js
+fun main(){
+  // add is not declared yet.
+    print(add(1, 2));
+}
+
+fun add(a, b) {
+    return a + b;
+}
+
+main();
+```
+
+This will work:
+```js
+fun add(a, b) {
+    return a + b;
+}
+
+fun main(){
+    print(add(1, 2));
+}
+
+main();
+```
 
 ### Named Functions
 
@@ -367,7 +510,8 @@ fun outer() {
 }
 ```
 
-### Functions can be passed as arguments to other functions.
+### Nesting
+Functions can be nested inside other functions.
 
 ```js
 // f() -> num -> num -> num
@@ -382,7 +526,9 @@ var add = fun(a, b) {
 var result = apply(add, 1, 2); // 3
 ```
 
-### Functions can be returned from other functions.
+### Returning Functions
+
+Functions can be returned from other functions.
 
 ```js
 fun createAdder(a) {
@@ -397,7 +543,9 @@ var add5 = createAdder(5);
 var result = add5(2); // 7
 ```
 
-### Functions can be stored in variables.
+### Assigning Functions To Variables
+
+Functions can be stored in variables.
 
 ```js
 var add = fun(a, b) {
@@ -407,7 +555,8 @@ var add = fun(a, b) {
 var result = add(1, 2); // 3
 ```
 
-### Functions support recursion.
+### Recursion
+Functions can call themselves.
 
 ```js
 fun factorial(n) {
@@ -420,7 +569,9 @@ fun factorial(n) {
 var result = factorial(5); // 120
 ```
 
-### Functions can contain private classes.
+### Private Classes In Functions
+Functions may declare classes that are only accessible within the function.
+
 ```js
 fun aWorldAwaits(){
     class IOnlyExistInMyWorld {
@@ -439,7 +590,7 @@ fun aWorldAwaits(){
 var x = aWorldAwaits();
 ```
 
-### But you can expose them if you want to.
+Unless the function wants to expose it:
 ```js
 fun iAmFree(){
     class IOnlyExistInMyWorld {
@@ -460,7 +611,76 @@ print(y().getName()); // "Not So Lonely Class"
 ```
 
 ## Classes
+[Back To Main Table Of Contents](#table-of-contents)
+
 OcheScript supports object-oriented programming with classes and single inheritance.
+
+### Classes Table Of Contents
+
+- [Declaring](#declaring)
+- [Instantiating](#instantiating)
+- [Inheritance](#inheritance)
+- [Constructor](#constructor)
+- [The `super` Keyword](#the-super-keyword)
+- [The `this` Keyword](#the-this-keyword)
+- [Class References](#class-references)
+- [Nested Classes](#nested-classes)
+- [Class Methods](#class-methods)
+- [Class Fields](#class-fields)
+- [The Special `.fields` Property](#the-special-fields-property)
+
+### Declaring
+Classes are declared using the `class` keyword.
+
+```js
+class Animal {}
+```
+
+### Referencing
+```js
+var animalReference = Animal;
+
+var animal = animalReference();
+```
+
+### Instantiating
+Classes are instantiated using the `()` operator, which in turn calls the constructor.  
+
+```js
+var animal = Animal();
+```
+
+### Inheritance
+Classes can inherit from other classes using the `extends` keyword.  OcheScript only supports single inheritance.
+
+```js
+class Animal {}
+
+class Dog extends Animal {}
+
+var dog = Dog();
+print(dog is Dog); // true
+print(dog is Animal); // true
+```
+
+### Constructor
+The `init()` method is the constructor for a class.  It is called when an instance of the class is created.
+
+```js
+class Animal {
+  init(animalName) {
+    // properties must be initialized in the constructor
+    this.name = animalName;
+  }
+}
+
+var animal = Animal("Animal");
+print(animal.name); // "Animal"
+```
+
+### The `super` Keyword
+
+The `super` keyword refers to the superclass of a class.
 
 ```js
 class Animal {
@@ -487,15 +707,30 @@ var d = Dog("Rex");
 d.speak(); // Rex barks.
 ```
 
-- `init()`: Constructor method.
-- `this`: Refers to the current instance.
-- `super`: Refers to the superclass.
+### The `this` Keyword
 
-### Classes are... first class.
+The `this` keyword refers to the current instance of a class.
+
+```js
+class Animal {
+  init(name) {
+    this.name = name;
+  }
+
+  speak() {
+    print(this.name + " makes a noise.");
+  }
+}
+
+var d = Animal("Rex");
+d.speak(); // Rex makes a noise.
+```
+
+### Class References
 Class declarations can be assigned to a variable, passed as an argument, or returned from a function.
 
 ```js
-var dogClass = class Dog extends Animal {
+class Dog extends Animal {
   init(name) {
     this.name = name;
   }
@@ -505,7 +740,11 @@ var dogClass = class Dog extends Animal {
   }
 };
 
-var d = dogClass("Rex");
+var dogClass = Dog; // reference to the class
+
+var d = dogClass("Rex"); // "()" instantiates the class via it's constructor
+
+print(d is Dog); // true
 d.speak(); // Rex barks.
 ```
 
@@ -563,60 +802,14 @@ class Animal {
 var d = Animal("Rex");
 d.speak(); // Rex makes a noise.
 ```
-### The `this` Keyword
-
-The `this` keyword refers to the current instance of a class.
-
-```js
-class Animal {
-  init(name) {
-    this.name = name;
-  }
-
-  speak() {
-    print(this.name + " makes a noise.");
-  }
-}
-
-var d = Animal("Rex");
-d.speak(); // Rex makes a noise.
-```
-
-### The `super` Keyword
-
-The `super` keyword refers to the superclass of a class.
-
-```js
-class Animal {
-  init(name) {
-    this.name = name;
-  }
-
-  speak() {
-    print(this.name + " makes a noise.");
-  }
-}
-
-class Dog extends Animal {
-  init(name) {
-    super.init(name);
-  }
-
-  speak() {
-    print(this.name + " barks.");
-  }
-}
-
-var d = Dog("Rex");
-d.speak(); // Rex barks.
-```
 
 ### Class Fields
-Fields must be declared inside the init() constructor, or as a property on a class instance.
+Fields (properties) must be declared inside the init() constructor, or as a property on a class instance.  They may also be defined dynamically on an instance.
 
 ```js
 class Animal {
   init(name) {
+    // name is now a default field on any instance of this class.
     this.name = name;
   }
 
@@ -651,6 +844,8 @@ print(d.foo); // 42
 **Use `.fields` with caution.**  It is not recommended to modify the `fields` map directly, except for advanced use-cases.
 
 ## Async / Await
+[Back To Table Of Contents](#table-of-contents)
+
 OcheScript provides limited support for asynchronous programming.  The `async` and `await` keywords are supported.  This is primarily in place for use with Dart interop.  The `Future` type is not supported natively.
 
 ```js
@@ -662,6 +857,8 @@ async fun fetchData() {
 ```
 
 ## Exception Handling
+[Back To Table Of Contents](#table-of-contents)
+
 OcheScript provides basic exception handling support.
 
 ### Try / Catch Examples
@@ -683,22 +880,46 @@ try {
 }
 ```
 
-## Directives
-Currently, OcheScript only supports the `#include` directive.
+### Unhandled Exceptions
+Unhandled errors will cause the runtime to halt.  
 
-### Include
-The `#include` directive allows you to split your code into multiple files.  This is not a package manager, it is simply a compile-time preprocessor operation.
+Since this is an embedded language, errors are **not** emitted to Dart stdout by default.  They are reported via the [Logging Package](https://pub.dev/packages/logging) at level WARNING and above.  To listen to these errors, you can use the `Logging` class from the `logging` package. This approach gives you more control over how to handle script errors that are uncaught by your script.
 
-```js
-#include utils
-// The contets of 'utils.oche' in the 'includes' directory or relative path are inserted here.
+```dart
+// (assumes you've added the logging package as a dependency in your pubspec.yaml)
+import 'package:logging/logging.dart';
+import 'package:oche_script/oche_script.dart' as oche;
+
+Future<void> main() async {
+  Logger.root.level = Level.WARNING;
+  Logger.root.onRecord.listen((record) {
+    print("${record.level.name}: ${record.message}");
+    // emits the error message and stack trace
+  });
+
+  final result = await oche.compileAndRun(r"print("Hello World!");");
+
+  print("Return Code: ${result['return_code']}");
+  if (result.containsKey('error')) {
+    print("Error: ${result['error']}");
+  }
+}
 ```
 
-Using include directives is a compile-time preprocessor operation, and is platform specific.  OcheScript provides an interface for writing your own preprocessor based on your platform.  For example on Windows, a preprocessor might use `dart:io` to find include files in the current directory and the /include sub-directory.  A Flutter implementation might look for include files in the flutter assets bundle.
+Error messages are also placed in the return map of the `compileAndRun` function (without stack trace).  The map has the following structure:
 
-See [Windows Example](http://github.com/atebitftw/ochescript/blob/main/lib/windows_preprocessor.dart).
+```dart
+{
+  "error": "{error message}",
+  "return_code": 1,
+  // other stuff emitted by any out() functions in the script.
+}
+```
 
-## Native Methods (Compile-Time Capability)
+
+## Native Methods
+[Back To Table Of Contents](#table-of-contents)
+
 Think of these as compile-time extension methods on supported types.
 
 ```js
@@ -707,27 +928,44 @@ var x = -10;
 print(x.abs()); // 10
 ```
 
-The vm provides the capability to register additional native methods at compile time.
+The OcheScript API provides the capability to register additional native methods at compile time.
 
 See the [Native Methods](https://github.com/atebitftw/ochescript/blob/main/doc/native_methods.md) document for more information.
 
 ## Native Functions
+[Back To Table Of Contents](#table-of-contents)
+
 These are standalone global functions that can be called from any script.
 
 ```js
 await wait(1000); // Waits for 1 second
 ```
 
-The vm provides the capability to register additional native functions at compile time.
+The OcheScript API provides the capability to register additional native functions at compile time.
 
 See the [Native Functions](https://github.com/atebitftw/ochescript/blob/main/doc/native_functions.md) document for more information.
 
-## The `out` Statement
-The `out` statement is used to export values from the script to the host application's state. It is similar to `print`, but instead of writing to stdout, it writes to a keyed output map.
+## Dart Interop
+[Back To Table Of Contents](#table-of-contents)
 
+See the [Dart Interop](https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md) document for more information.
+
+## Directives
+[Back To Table Of Contents](#table-of-contents)
+
+Currently, OcheScript only supports the `#include` directive.
+
+### Include
+The `#include` directive allows you to split your code into multiple files.  This is not a package manager, it is simply a compile-time preprocessor operation.
+
+If directives are supported by your implementation, you can use them to declare other script "libraries" that you want to include with your script.
+
+Let's say you have a script library called `utils.oche` that you want to include with your script.  You can do this by adding the following line to the top of your script:
 ```js
-var result = 42;
-out("result", result);
+#include utils
+// The contets of 'utils.oche' in the 'includes' directory or relative path are inserted here.
 ```
 
-On the host side, this can be accessed via the `CompileAndRun` return value or the `outCallback`.
+Using include directives is a compile-time preprocessor operation, and is platform specific.  OcheScript provides an interface for writing your own preprocessor based on your platform.  For example on Windows, a preprocessor might use `dart:io` to find include files in the current directory and the /include sub-directory.  A Flutter implementation might look for include files in the flutter assets bundle.
+
+See [Windows Example](http://github.com/atebitftw/ochescript/blob/main/lib/windows_preprocessor.dart).
