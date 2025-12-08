@@ -31,3 +31,6 @@ Public release.
 
 # 1.1.1
 - Enchanced documentation.
+
+# 1.1.2
+- More documentation enhancements.
