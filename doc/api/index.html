@@ -45,23 +45,22 @@
 <section class="desc markdown">
   <h1 id="ochescript">OcheScript</h1>
 <p><a href="https://github.com/atebitftw/ochescript/actions/workflows/dart.yaml"><img src="https://github.com/atebitftw/ochescript/actions/workflows/dart.yaml/badge.svg" alt="Dart CI"></a></p>
-<p><img src="https://atebitftw.github.io/site/assets/oche_script_logo_640.png" alt="OcheScript Logo">
-<em>Oche <em>(pronounced "ock-ee")</em>. The official name for the throwing line in a game of darts.</em></p>
+<p><img src="https://atebitftw.github.io/site/assets/oche_script_logo_640.png" alt="OcheScript Logo"></p>
+<p><em>Oche <em>(pronounced "ock-ee")</em>. The official name for the throwing line in a game of darts.</em></p>
 <h4 id="embedded-script-language-for-flutterdart-applications">Embedded script language for Flutter/Dart applications.</h4>
 <h2 id="key-features">Key Features</h2>
-<p>OcheScript is an extensible, lightweight yet powerful scripting language designed for embedding into Dart/Flutter applications.</p>
 <ul>
-<li><strong>Convenient <a href="https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md">Dart interop</a> Features.</strong>
+<li><strong>Convenient <a href="https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md">Dart interop</a> Features:</strong>
 <ul>
 <li><strong>Initialize OcheScript globals from Dart.</strong></li>
-<li><strong>Call Dart functions from OcheScript and get return values.</strong></li>
+<li><strong>Call Dart functions from OcheScript and get return values. Supports async calls.</strong></li>
 <li><strong>Send values from OcheScript to Dart at any time.</strong></li>
 </ul>
 </li>
-<li><strong>Extensible - Make It Your Own</strong>
+<li><strong>Extensible - Make It Your Own:</strong>
 <ul>
-<li><strong>Define <a href="https://github.com/atebitftw/ochescript/blob/main/doc/native_methods.md">extension methods</a> bound to supported types (many already included).</strong></li>
-<li><strong>Define <a href="https://github.com/atebitftw/ochescript/blob/main/doc/native_functions.md">global functions</a> that can execute arbitrary Dart code (many already included).</strong></li>
+<li><strong><a href="https://github.com/atebitftw/ochescript/blob/main/doc/native_methods.md">Native Methods</a> bound to supported types (many already included).</strong></li>
+<li><strong><a href="https://github.com/atebitftw/ochescript/blob/main/doc/native_functions.md">Native Functions</a> that can execute arbitrary Dart code (many already included).</strong></li>
 </ul>
 </li>
 <li><strong>Object-Oriented Programming Features (classes, methods, properties, etc.).</strong></li>
@@ -72,6 +71,7 @@
 <li><strong>Lightweight Preprocessor Directive Capabilities.</strong></li>
 <li><strong><code>.oche</code> Script File Syntax Highlighting Extension for VSCode/Antigravity.</strong></li>
 <li><strong>Comprehensive API and Language Documentation.</strong></li>
+<li><strong>Backed by years of actual production use in real-world business applications.</strong></li>
 </ul>
 <h2 id="hello-world-in-ochescript">Hello World In OcheScript</h2>
 <pre class="language-dart"><code class="language-dart">import 'package:oche_script/oche_script.dart' as oche;
@@ -83,17 +83,23 @@ Future&lt;void&gt; main() async {
 // Hello World!
 </code></pre>
 <h2 id="getting-started">Getting Started</h2>
-<p>See the <a href="https://github.com/atebitftw/ochescript/blob/main/doc/getting_started.md">Getting Started</a> document for more information.</p>
+<p>See the <a href="https://github.com/atebitftw/ochescript/blob/main/doc/getting_started.md">Getting Started</a> document to get up and running quickly.</p>
 <h2 id="language-specification">Language Specification</h2>
-<p>See the <a href="https://github.com/atebitftw/ochescript/blob/main/doc/language_specification.md">Language Specification</a> document for more information.</p>
+<p>See the <a href="https://github.com/atebitftw/ochescript/blob/main/doc/language_specification.md">Language Specification</a> for a complete overview of the language features and capabilities.</p>
 <h2 id="library-api">Library API</h2>
-<p>See the <a href="https://pub.dev/documentation/oche_script/latest/">API</a> document for more information.  This is an HTML document generated from the Dartdoc comments in the source code.</p>
+<p>The API is comprised three main components:</p>
+<ol>
+<li>Script running <code>compileAndRun</code></li>
+<li>Native Function registration <code>registerNativeFunction</code></li>
+<li>Native Method registration <code>registerNativeMethod</code></li>
+</ol>
+<p>The API also exposes built-in native functions and methods, for reference.</p>
+<p>See the <a href="https://pub.dev/documentation/oche_script/latest/">API</a>.</p>
 <h2 id="dart-interop">Dart Interop</h2>
-<p>See the <a href="https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md">Dart Interop</a> document for more information.</p>
+<p>See the <a href="https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md">Dart Interop</a> to learn about all the ways that OcheScript can interact with your Dart code.</p>
 <h2 id="why-does-this-exist">Why Does This Exist?</h2>
-<p>I work on some very large-scale Flutter projects that sometimes require a bit of dynamic runtime automation, and I found that I needed execute arbitrary code at runtime in certain situations.  I built OcheScript to meet this need.  In the Flutter/Dart ecosystem, there are probably five people that need this kind of thing, and I am one of them.  To the other four, I say: "Hello World!".</p>
-<p><em>Side Note: Dart technically does have arbitrary code execution capability via <code>dart:mirrors</code>, but I personally do not consider it to be a viable approach for many production application scenarios, especially anything Flutter-based (mirrors disallowed).  Another reason to avoid mirrors: As soon as you bring in mirrors, you lose tree-shaking.</em></p>
-<h2 id="these-batteries-are-not-included">These Batteries Are Not Included</h2>
+<p>I built OcheScript a while back to meet a need that I have on my larger Flutter projects to store and execute arbitrary code at runtime.  In the Flutter/Dart ecosystem, there are probably five people that need this kind of thing, and I am one of them.  To the other four, I say: "Hello World!".</p>
+<h2 id="these-batteries-are-not-included">These Batteries Are Not Included:</h2>
 <ul>
 <li>No module system (beyond <code>#INCLUDE</code> directive)</li>
 <li>No operator overloading.</li>
@@ -102,17 +108,10 @@ Future&lt;void&gt; main() async {
 <li>No direct support for accessing file systems or assets.  This can be achieved via Dart interop.</li>
 <li>No support for ternary operator.</li>
 </ul>
-<h2 id="stack-size-limits">Stack Size Limits</h2>
-<p>Since the scope of this language is to live embedded inside other Dart applications, the virtual machine stack is fixed to a size of 8192 elements.  This is to prevent memory exhaustion in the host Dart environment.  If the stack overflows, the virtual machine will throw a runtime error.</p>
-<p>Most scripts will rarely come close to this limit (most will never exceed 100).  However there are some rare scenarios that could cause a stack overflow:</p>
-<ul>
-<li>Trying to implement a deep recursion algorithm.</li>
-<li>Defining a large static list (e.g. <code>var x = [1, 2, 3, ...]; // are you declaring 8192 static elements in a list?</code>) may cause a stack overflow because the compiler pushes each element of the list onto the stack before actually building the list.  Better to define the list dynamically (e.g. <code>var x = []; for (var i = 0; i &lt; 10000; i++) x.add(i);</code>) as this only pushes one element onto the stack at a time.</li>
-</ul>
 <h2 id="roadmap-ideas">Roadmap Ideas</h2>
 <ul>
 <li>Adding try/catch exception handling will probably be my next effort.</li>
-<li>Native method binding to user-defined class instances sounds intriguing.  Though at that point, I may as well just implement native extension method support withing the language.</li>
+<li>Native method binding to user-defined class instances sounds intriguing.  Though at that point, I may as well just implement native extension method support within the language itself.</li>
 <li>Perhaps implement support for a Record type, and destructuring syntax.  It would be nice to pass anonymous records back and forth between Dart and OcheScript.</li>
 <li>More robust support for Futures and async/await.  OcheScript currently doesn't have it's own microtask queue, so it can't run async code in the same way that Dart can.  It does have the capability to await futures, but it doesn't have it's own event loop.</li>
 <li>I would like eventually to implement a LINQ-style query syntax for OcheScript, to make it more useful for data processing and manipulation.  Perhaps with some kind of provider interface to Dart-side data services like Firebase, REDIS, etc.</li>
@@ -122,9 +121,9 @@ Future&lt;void&gt; main() async {
 <p>In <a href="https://github.com/atebitftw/ochescript/tree/main/tool/vs_code_syntax_highlighter/ochescript">VS Code Extension</a> there is a a VSCode extension project that provides basic syntax highlighting for OcheScript files (.oche). You can use this extension by importing the <code>.vsix</code> file into VSCode manually.</p>
 <p>You can find the compiled .vsix extension file in the bin/ directory of this project: <a href="https://github.com/atebitftw/ochescript/tree/main/bin">here</a></p>
 <h2 id="about-me">About Me</h2>
-<p>My name is John, and if you've been a Dart enthusiast prior to M1 (way before v1 release), then we are probably friends.</p>
+<p>My name is John, and if you've been a Dart enthusiast prior to M1 (way before v1 release), then we are probably friends.  I've been using OcheScript in production for years now, and it is my pleasure to now share it with the other four of you who will need it.</p>
 <h2 id="attributions-and-gratitude">Attributions and Gratitude</h2>
-<p>The bones of this project are adapted from the excellent work of Bob Nystrom (<a href="https://github.com/munificent">Github</a>, <a href="https://bsky.app/profile/stuffwithstuff.com">BlueSky</a>) in his book: "<a href="https://craftinginterpreters.com/">Crafting Interpreters</a>", portions of which are licensed under the MIT License <a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE">see here</a>.</p>
+<p>The bones of this project are adapted from the excellent work of <strong>Robert Nystrom</strong> (<a href="https://github.com/munificent">Github</a>, <a href="https://bsky.app/profile/stuffwithstuff.com">BlueSky</a>) in his book: <strong>"<a href="https://craftinginterpreters.com/">Crafting Interpreters</a></strong>", portions of which are licensed under the MIT License <a href="https://github.com/munificent/craftinginterpreters/blob/master/LICENSE">see here</a>.</p>
 <p>I <strong>highly</strong> recommend this book if you are interested in learning how to build an interpreter.  It is a great resource.</p>
 <p>Thanks Bob!</p>
 </section>
