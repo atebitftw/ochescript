@@ -57,12 +57,10 @@
 <li>Closures and lambdas.</li>
 <li>(Limited) Asynchronous support (async/await).</li>
 <li>String interpolation.</li>
+<li>Try/catch exception handling.</li>
 <li>Lightweight preprocessor directive capabilities.</li>
 <li><code>.oche</code> script file syntax highlighting extension for VSCode/Antigravity.</li>
 </ul>
-<h2 id="why-does-this-exist">Why Does This Exist?</h2>
-<p>I work on some very large-scale Flutter projects that sometimes require a bit of dynamic runtime automation, and I found that I needed execute arbitrary code at runtime in certain situations.  I built OcheScript to meet this need.  In the Flutter/Dart ecosystem, there are probably five people that need this kind of thing, and I am one of them.  To the other four, I say: "Hello World!".</p>
-<p><em>Side Note: Dart technically does have arbitrary code execution capability via <code>dart:mirrors</code>, but I personally do not consider it to be a viable approach for many production application scenarios, especially anything Flutter-based (mirrors disallowed).  Another reason to avoid mirrors: As soon as you bring in mirrors, you lose tree-shaking.</em></p>
 <h2 id="hello-world-in-ochescript">Hello World In OcheScript</h2>
 <p><em>In a text file with extension <code>.oche</code></em></p>
 <pre class="language-js"><code class="language-js">print("Hello World!");
@@ -82,8 +80,11 @@ Future&lt;void&gt; main() async {
 <p>See the <a href="https://github.com/atebitftw/ochescript/tree/main/doc/api">API</a> document for more information.  This is an HTML document generated from the Dartdoc comments in the source code.</p>
 <h2 id="dart-interop">Dart Interop</h2>
 <p>See the <a href="https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md">Dart Interop</a> document for more information.</p>
+<h2 id="why-does-this-exist">Why Does This Exist?</h2>
+<p>I work on some very large-scale Flutter projects that sometimes require a bit of dynamic runtime automation, and I found that I needed execute arbitrary code at runtime in certain situations.  I built OcheScript to meet this need.  In the Flutter/Dart ecosystem, there are probably five people that need this kind of thing, and I am one of them.  To the other four, I say: "Hello World!".</p>
+<p><em>Side Note: Dart technically does have arbitrary code execution capability via <code>dart:mirrors</code>, but I personally do not consider it to be a viable approach for many production application scenarios, especially anything Flutter-based (mirrors disallowed).  Another reason to avoid mirrors: As soon as you bring in mirrors, you lose tree-shaking.</em></p>
 <h2 id="error-handling">Error Handling</h2>
-<p>Runtime errors cause script execution to halt with an error message.</p>
+<p>Unless captured in a <code>try/catch</code> block, runtime errors cause script execution to halt with an error message.</p>
 <p>Errors are not emitted to stdout by default.  They are usually reported via the <a href="https://pub.dev/packages/logging">Logging Package</a> at level WARNING and above.  To listen to these errors, you can use the <code>Logging</code> class from the <code>logging</code> package.</p>
 <pre class="language-dart"><code class="language-dart">// (assumes you've added the logging package as a dependency in your pubspec.yaml)
 import 'package:logging/logging.dart';
@@ -121,7 +122,6 @@ Future&lt;void&gt; main() async {
 <p>This is useful for debugging scripts that are composed of multiple files.</p>
 <h2 id="these-batteries-are-not-included">These Batteries Are Not Included</h2>
 <ul>
-<li>No try/catch exception handling.</li>
 <li>No module system (beyond <code>#INCLUDE</code> directive)</li>
 <li>No operator overloading.</li>
 <li>Map keys must be strings.</li>
@@ -258,7 +258,7 @@ Future&lt;void&gt; main() async {
 <footer>
   <span class="no-break">
     oche_script
-      1.0.7
+      1.1.0
   </span>
   
 </footer>
