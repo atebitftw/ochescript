@@ -21,7 +21,11 @@ pubspec.lock
 *.js.deps
 *.js.map
 
+# me
 scratch.oche
+
+# AI
+tool/ai_testing/
 
 .flutter-plugins
 .flutter-plugins-dependencies
@@ -31,3 +35,4 @@ scratch.oche
 
 .vscode/
 !tool/vs_code_syntax_highlighter/ochescript/.vscode
+
