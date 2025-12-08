@@ -62,13 +62,6 @@ I work on some very large-scale Flutter projects that sometimes require a bit of
 *   No direct support for accessing file systems or assets.  This can be achieved via Dart interop.
 *   No support for ternary operator.
 
-## Stack Size Limits
-Since the scope of this language is to live embedded inside other Dart applications, the virtual machine stack is fixed to a size of 8192 elements.  This is to prevent memory exhaustion in the host Dart environment.  If the stack overflows, the virtual machine will throw a runtime error.
-
-Most scripts will rarely come close to this limit (most will never exceed 100).  However there are some rare scenarios that could cause a stack overflow:
-- Trying to implement a deep recursion algorithm.
-- Defining a large static list (e.g. `var x = [1, 2, 3, ...]; // are you declaring 8192 static elements in a list?`) may cause a stack overflow because the compiler pushes each element of the list onto the stack before actually building the list.  Better to define the list dynamically (e.g. `var x = []; for (var i = 0; i < 10000; i++) x.add(i);`) as this only pushes one element onto the stack at a time.
-
 ## Roadmap Ideas
 *   Adding try/catch exception handling will probably be my next effort.
 *   Native method binding to user-defined class instances sounds intriguing.  Though at that point, I may as well just implement native extension method support within the language itself.
