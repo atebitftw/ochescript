@@ -33,6 +33,11 @@ The following words are reserved (case-sensitive):
 *   `default`
 *   `is`
 *   `in`
+*   `try`
+*   `catch`
+*   `throw`
+*   `async`
+*   `await`
 
 These are case-sensitive and are only used for type checking (e.g. `var n = 123; print(n is Num);`)
 *   `List`
@@ -653,6 +658,28 @@ async fun fetchData() {
     // calling registered dart function via interop.
     var data = await dart("dart_func", [args]);
     return data;
+}
+```
+
+## Exception Handling
+OcheScript provides basic exception handling support.
+
+### Try / Catch Examples
+```js
+try {
+    throw 42; // runtime error
+} catch (e) {
+    print(e); // 42
+}
+```
+
+```js
+try {
+    var code = 404;
+    var message = "Not Found";
+    throw "Error: $code - $message";
+} catch (e) {
+    print(e); // Error: 404 - Not Found
 }
 ```
 

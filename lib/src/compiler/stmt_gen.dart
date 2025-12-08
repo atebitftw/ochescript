@@ -24,6 +24,38 @@ abstract class StmtVisitor<R> {
   R visitSwitchCaseStmt(SwitchCase stmt);
   R visitSwitchStmt(Switch stmt);
   R visitForInStmt(ForIn stmt);
+  R visitTryStmt(Try stmt);
+  R visitThrowStmt(Throw stmt);
+}
+
+class Try extends Stmt {
+  Try(this.tryBlock, this.catchBlock, this.catchVariable, {required super.token});
+
+  final Stmt tryBlock;
+  final Stmt catchBlock;
+  final Token catchVariable;
+
+  @override
+  R accept<R>(StmtVisitor<R> visitor) {
+    return visitor.visitTryStmt(this);
+  }
+
+  @override
+  String toString() => "Try";
+}
+
+class Throw extends Stmt {
+  Throw(this.value, {required super.token});
+
+  final Expr value;
+
+  @override
+  R accept<R>(StmtVisitor<R> visitor) {
+    return visitor.visitThrowStmt(this);
+  }
+
+  @override
+  String toString() => "Throw";
 }
 
 class Out extends Stmt {
@@ -144,13 +176,7 @@ class While extends Stmt {
 }
 
 class ScriptFunction extends Stmt {
-  ScriptFunction(
-    this.name,
-    this.params,
-    this.body,
-    this.isAsync, {
-    required super.token,
-  });
+  ScriptFunction(this.name, this.params, this.body, this.isAsync, {required super.token});
 
   final Token name;
   final List<Token> params;
@@ -221,13 +247,7 @@ class Continue extends Stmt {
 }
 
 class For extends Stmt {
-  For(
-    this.initializer,
-    this.condition,
-    this.increment,
-    this.body, {
-    required super.token,
-  });
+  For(this.initializer, this.condition, this.increment, this.body, {required super.token});
 
   final Stmt? initializer;
   final Expr? condition;

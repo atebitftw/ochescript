@@ -133,10 +133,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
     } else {
       // Check for global redeclaration
       if (_definedGlobals.contains(stmt.name.lexeme)) {
-        throw _error(
-          stmt.name.line,
-          "Variable '${stmt.name.lexeme}' is already declared.",
-        );
+        throw _error(stmt.name.line, "Variable '${stmt.name.lexeme}' is already declared.");
       }
       _definedGlobals.add(stmt.name.lexeme);
 
@@ -187,9 +184,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
   @override
   void visitWhileStmt(While stmt) {
     final loopStart = _currentChunk.code.length;
-    _state.loops.add(
-      Loop(loopStart, _state.scopeDepth, continueOffset: loopStart),
-    ); // Push loop
+    _state.loops.add(Loop(loopStart, _state.scopeDepth, continueOffset: loopStart)); // Push loop
 
     stmt.condition.accept(this);
 
@@ -306,10 +301,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
         emitOp(OpCode.shiftRight, expr.operation.line);
         break;
       default:
-        throw _error(
-          expr.operation.line,
-          "Binary operator ${expr.operation.type} not implemented.",
-        );
+        throw _error(expr.operation.line, "Binary operator ${expr.operation.type} not implemented.");
     }
   }
 
@@ -321,8 +313,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
   @override
   void visitUnaryExpr(Unary expr) {
     // Handle prefix increment/decrement differently
-    if (expr.operation.type == TokenType.INC ||
-        expr.operation.type == TokenType.DEC) {
+    if (expr.operation.type == TokenType.INC || expr.operation.type == TokenType.DEC) {
       // Prefix ++a or --a
       // For prefix, we need to: increment/decrement the variable, then leave the new value on stack
 
@@ -354,10 +345,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
         }
         // The SET operations leave the value on the stack, which is what we want for prefix
       } else {
-        throw _error(
-          expr.operation.line,
-          "Prefix operator only supported on variables for now.",
-        );
+        throw _error(expr.operation.line, "Prefix operator only supported on variables for now.");
       }
     } else {
       // Regular unary operators (-, !)
@@ -373,10 +361,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
           emitOp(OpCode.bitNot, expr.operation.line);
           break;
         default:
-          throw _error(
-            expr.operation.line,
-            "Unary operator ${expr.operation.type} not implemented.",
-          );
+          throw _error(expr.operation.line, "Unary operator ${expr.operation.type} not implemented.");
       }
     }
   }
@@ -437,18 +422,14 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
       final method = sup.method;
       final nameIdx = _currentChunk.addConstant(method.lexeme);
 
-      visitVariableExpr(
-        Variable(Token(TokenType.THIS, "this", 0), token: sup.token),
-      );
+      visitVariableExpr(Variable(Token(TokenType.THIS, "this", 0), token: sup.token));
 
       // Args
       for (final arg in expr.arguments) {
         arg.accept(this);
       }
 
-      visitVariableExpr(
-        Variable(Token(TokenType.SUPER, "super", 0), token: sup.token),
-      );
+      visitVariableExpr(Variable(Token(TokenType.SUPER, "super", 0), token: sup.token));
 
       emitOp(OpCode.superInvoke, expr.operation.line);
       emitByte(nameIdx, expr.operation.line);
@@ -494,8 +475,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
         }
       }
     } else if (expr is Unary) {
-      if (expr.operation.type == TokenType.INC ||
-          expr.operation.type == TokenType.DEC) {
+      if (expr.operation.type == TokenType.INC || expr.operation.type == TokenType.DEC) {
         if (expr.right is Variable) {
           final variable = expr.right as Variable;
           int arg = _resolveLocal(_state, variable.name);
@@ -514,12 +494,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
     return false;
   }
 
-  void _function(
-    FunctionType type,
-    List<Token> params,
-    List<Stmt> body,
-    String name,
-  ) {
+  void _function(FunctionType type, List<Token> params, List<Stmt> body, String name) {
     final function = ObjFunction(Chunk(), name: name, arity: params.length);
     final enclosing = _state;
     _state = CompilerState(enclosing, function, type);
@@ -563,8 +538,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
     _state.scopeDepth--;
 
     // Pop locals from the stack
-    while (_state.locals.isNotEmpty &&
-        _state.locals.last.depth > _state.scopeDepth) {
+    while (_state.locals.isNotEmpty && _state.locals.last.depth > _state.scopeDepth) {
       if (_state.locals.last.isCaptured) {
         emitOp(OpCode.closeUpValue, line);
       } else {
@@ -577,12 +551,8 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
   void _addLocal(Token name) {
     // Check for redeclaration in same scope
     for (final local in _state.locals) {
-      if (local.depth == _state.scopeDepth &&
-          local.name.lexeme == name.lexeme) {
-        throw _error(
-          name.line,
-          "Variable '${name.lexeme}' is already declared in this scope.",
-        );
+      if (local.depth == _state.scopeDepth && local.name.lexeme == name.lexeme) {
+        throw _error(name.line, "Variable '${name.lexeme}' is already declared in this scope.");
       }
     }
     _state.locals.add(Local(name, _state.scopeDepth));
@@ -624,9 +594,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
     }
 
     state.upvalues.add(Upvalue(index, isLocal));
-    state.function.upvalues.add(
-      isLocal ? "local:$index" : "upvalue:$index",
-    ); // For debug
+    state.function.upvalues.add(isLocal ? "local:$index" : "upvalue:$index"); // For debug
     return state.upvalues.length - 1;
   }
 
@@ -670,10 +638,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
   @override
   void visitBreakStmt(Break stmt) {
     if (_state.loops.isEmpty && _state.switches.isEmpty) {
-      throw _error(
-        stmt.token.line,
-        "Cannot use 'break' outside of a loop or switch.",
-      );
+      throw _error(stmt.token.line, "Cannot use 'break' outside of a loop or switch.");
     }
 
     bool breakFromLoop = false;
@@ -748,12 +713,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
 
     for (final method in stmt.methods) {
       final nameIdx = _currentChunk.addConstant(method.name.lexeme);
-      _function(
-        FunctionType.method,
-        method.params,
-        method.body,
-        method.name.lexeme,
-      );
+      _function(FunctionType.method, method.params, method.body, method.name.lexeme);
       emitOp(OpCode.method, method.name.line);
       emitByte(nameIdx, method.name.line);
     }
@@ -771,6 +731,35 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
   @override
   void visitConstStmt(Const stmt) {
     throw _error(stmt.token.line, "Const statements are not supported.");
+  }
+
+  @override
+  void visitThrowStmt(Throw stmt) {
+    stmt.value.accept(this);
+    emitOp(OpCode.throwOp, stmt.token.line);
+  }
+
+  @override
+  void visitTryStmt(Try stmt) {
+    emitOp(OpCode.tryOp, stmt.token.line);
+    emitByte(0xff, stmt.token.line);
+    emitByte(0xff, stmt.token.line);
+    final catchJump = _currentChunk.code.length - 2;
+
+    stmt.tryBlock.accept(this);
+
+    emitOp(OpCode.endTryOp, stmt.token.line);
+
+    final skipCatchJump = _emitJump(OpCode.jumpOp, stmt.token.line);
+
+    _patchJump(catchJump);
+
+    _beginScope();
+    _addLocal(stmt.catchVariable);
+    stmt.catchBlock.accept(this);
+    _endScope(stmt.token.line);
+
+    _patchJump(skipCatchJump);
   }
 
   @override
@@ -910,9 +899,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
 
     final loopStart = _currentChunk.code.length;
     final continueOffset = stmt.increment == null ? loopStart : -1;
-    _state.loops.add(
-      Loop(loopStart, _state.scopeDepth, continueOffset: continueOffset),
-    );
+    _state.loops.add(Loop(loopStart, _state.scopeDepth, continueOffset: continueOffset));
 
     int exitJump = -1;
 
@@ -1056,10 +1043,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
       emitOp(OpCode.pop, expr.operator.line); // Pop the set result (new value)
       // Old value remains on stack
     } else {
-      throw RuntimeError.withLine(
-        expr.operator.line,
-        "Postfix operator only supported on variables for now.",
-      );
+      throw RuntimeError.withLine(expr.operator.line, "Postfix operator only supported on variables for now.");
     }
   }
 
@@ -1083,50 +1067,32 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
   @override
   void visitSuperExpr(Super expr) {
     // "this"
-    int arg = _resolveLocal(
-      _state,
-      Token(TokenType.THIS, "this", expr.keyword.line),
-    );
+    int arg = _resolveLocal(_state, Token(TokenType.THIS, "this", expr.keyword.line));
     if (arg != -1) {
       emitOp(OpCode.getLocal, expr.keyword.line);
       emitByte(arg, expr.keyword.line);
     } else {
-      arg = _resolveUpvalue(
-        _state,
-        Token(TokenType.THIS, "this", expr.keyword.line),
-      );
+      arg = _resolveUpvalue(_state, Token(TokenType.THIS, "this", expr.keyword.line));
       if (arg != -1) {
         emitOp(OpCode.getUpValue, expr.keyword.line);
         emitByte(arg, expr.keyword.line);
       } else {
-        throw RuntimeError.withLine(
-          expr.keyword.line,
-          "Cannot use 'super' outside of a class method.",
-        );
+        throw RuntimeError.withLine(expr.keyword.line, "Cannot use 'super' outside of a class method.");
       }
     }
 
     // "super"
-    arg = _resolveLocal(
-      _state,
-      Token(TokenType.SUPER, "super", expr.keyword.line),
-    );
+    arg = _resolveLocal(_state, Token(TokenType.SUPER, "super", expr.keyword.line));
     if (arg != -1) {
       emitOp(OpCode.getLocal, expr.keyword.line);
       emitByte(arg, expr.keyword.line);
     } else {
-      arg = _resolveUpvalue(
-        _state,
-        Token(TokenType.SUPER, "super", expr.keyword.line),
-      );
+      arg = _resolveUpvalue(_state, Token(TokenType.SUPER, "super", expr.keyword.line));
       if (arg != -1) {
         emitOp(OpCode.getUpValue, expr.keyword.line);
         emitByte(arg, expr.keyword.line);
       } else {
-        throw RuntimeError.withLine(
-          expr.keyword.line,
-          "Cannot use 'super' in a class with no superclass.",
-        );
+        throw RuntimeError.withLine(expr.keyword.line, "Cannot use 'super' in a class with no superclass.");
       }
     }
 
@@ -1136,21 +1102,15 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
   }
 
   @override
-  void visitSwitchCaseStmt(SwitchCase stmt) => throw RuntimeError.withLine(
-    stmt.token.line,
-    "SwitchCase should not be visited directly.",
-  );
+  void visitSwitchCaseStmt(SwitchCase stmt) =>
+      throw RuntimeError.withLine(stmt.token.line, "SwitchCase should not be visited directly.");
 
   @override
   void visitSwitchStmt(Switch stmt) {
     stmt.expression.accept(this); // Push switch value
 
     _beginScope();
-    final tempToken = Token(
-      TokenType.IDENTIFIER,
-      "*switch_temp*",
-      stmt.token.line,
-    );
+    final tempToken = Token(TokenType.IDENTIFIER, "*switch_temp*", stmt.token.line);
     _addLocal(tempToken);
     final switchValueIndex = _state.locals.length - 1;
 
@@ -1173,10 +1133,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
         emitOp(OpCode.equal, caseStmt.token.line);
 
         // Jump if False (Skip this case)
-        final nextCheckJump = _emitJump(
-          OpCode.jumpIfFalse,
-          caseStmt.token.line,
-        );
+        final nextCheckJump = _emitJump(OpCode.jumpIfFalse, caseStmt.token.line);
 
         // If True (Match): Pop the true value and Jump to Body
         emitOp(OpCode.pop, caseStmt.token.line);
@@ -1249,10 +1206,7 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
       emitOp(OpCode.getUpValue, expr.keyword.line);
       emitByte(arg, expr.keyword.line);
     } else {
-      throw RuntimeError.withLine(
-        expr.keyword.line,
-        "Cannot use 'this' outside of a class.",
-      );
+      throw RuntimeError.withLine(expr.keyword.line, "Cannot use 'this' outside of a class.");
     }
   }
 }

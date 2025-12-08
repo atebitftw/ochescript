@@ -191,4 +191,14 @@ enum OpCode {
   /// Decrement a local variable in place (pushes nothing).
   /// Operand: 1 byte stack slot index.
   decLocal,
+
+  /// Throw an exception.
+  throwOp,
+
+  /// Enter a try block.
+  /// Operand: 2 byte offset to the catch block.
+  tryOp,
+
+  /// Exit a try block (pop the exception handler).
+  endTryOp,
 }

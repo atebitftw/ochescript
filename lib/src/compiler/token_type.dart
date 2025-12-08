@@ -72,6 +72,9 @@ enum TokenType {
   ASYNC,
   AWAIT,
   IN,
+  TRY,
+  CATCH,
+  THROW,
 
   ERROR,
   EOF,

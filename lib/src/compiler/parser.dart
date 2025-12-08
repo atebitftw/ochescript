@@ -84,6 +84,12 @@ class Parser {
     if (_match([TokenType.SWITCH])) {
       return _switchStatement();
     }
+    if (_match([TokenType.TRY])) {
+      return _tryStatement();
+    }
+    if (_match([TokenType.THROW])) {
+      return _throwStatement();
+    }
 
     if (_match([TokenType.LEFT_BRACE])) {
       return Block(_block(), token: _previous());
@@ -106,10 +112,7 @@ class Parser {
 
     Variable? superclass;
     if (_match([TokenType.EXTENDS])) {
-      superclass = Variable(
-        _consume(TokenType.IDENTIFIER, "Expect superclass name.")!,
-        token: _previous(),
-      );
+      superclass = Variable(_consume(TokenType.IDENTIFIER, "Expect superclass name.")!, token: _previous());
     }
     _consume(TokenType.LEFT_BRACE, "Expect '{' after class name.");
     List<ScriptFunction> methods = [];
@@ -253,6 +256,34 @@ class Parser {
     return If(condition, thenBranch, elseBranch, token: _previous());
   }
 
+  Stmt _tryStatement() {
+    Token tryToken = _previous();
+    _consume(TokenType.LEFT_BRACE, "Expect '{' before try block.");
+    List<Stmt> tryStmts = _block();
+
+    _consume(TokenType.CATCH, "Expect 'catch' after try block.");
+    _consume(TokenType.LEFT_PAREN, "Expect '(' after catch.");
+    Token catchVariable = _consume(TokenType.IDENTIFIER, "Expect catch variable name.")!;
+    _consume(TokenType.RIGHT_PAREN, "Expect ')' after catch variable.");
+
+    _consume(TokenType.LEFT_BRACE, "Expect '{' before catch block.");
+    List<Stmt> catchStmts = _block();
+
+    return Try(
+      Block(tryStmts, token: tryToken),
+      Block(catchStmts, token: tryToken),
+      catchVariable,
+      token: tryToken,
+    );
+  }
+
+  Stmt _throwStatement() {
+    Token throwToken = _previous();
+    Expr value = _expression();
+    _consume(TokenType.SEMICOLON, "Expect ';' after throw value.");
+    return Throw(value, token: throwToken);
+  }
+
   Stmt _switchStatement() {
     Token switchKeyword = _previous();
     _consume(TokenType.LEFT_PAREN, "Expect '(' after 'switch'.");
@@ -279,10 +310,7 @@ class Parser {
       _consume(TokenType.COLON, "Expect ':' after case value.");
 
       List<Stmt> statements = [];
-      while (!_check(TokenType.CASE) &&
-          !_check(TokenType.DEFAULT) &&
-          !_check(TokenType.RIGHT_BRACE) &&
-          !_isAtEnd()) {
+      while (!_check(TokenType.CASE) && !_check(TokenType.DEFAULT) && !_check(TokenType.RIGHT_BRACE) && !_isAtEnd()) {
         statements.add(_declaration());
       }
       cases.add(SwitchCase(value, statements, token: caseToken!));
@@ -331,13 +359,7 @@ class Parser {
         final get = expr;
         return Set(get.object, get.name, value, token: _previous());
       } else if (expr is Index) {
-        return SetIndex(
-          expr.object,
-          expr.bracket,
-          expr.index,
-          value,
-          token: _previous(),
-        );
+        return SetIndex(expr.object, expr.bracket, expr.index, value, token: _previous());
       }
       _errorAt(equals, "Invalid assignment target.");
     }
@@ -413,13 +435,7 @@ class Parser {
   Expr _comparison() {
     Expr expr = _shift();
 
-    while (_match([
-      TokenType.GREATER,
-      TokenType.GREATER_EQUAL,
-      TokenType.LESS,
-      TokenType.LESS_EQUAL,
-      TokenType.IS,
-    ])) {
+    while (_match([TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL, TokenType.IS])) {
       Token operator = _previous();
       Expr right;
       if (operator.type == TokenType.IS) {
@@ -484,12 +500,7 @@ class Parser {
   }
 
   Expr _unary() {
-    if (_match([
-      TokenType.BANG,
-      TokenType.INC,
-      TokenType.DEC,
-      TokenType.BITNOT,
-    ])) {
+    if (_match([TokenType.BANG, TokenType.INC, TokenType.DEC, TokenType.BITNOT])) {
       Token operator = _previous();
       Expr right = _unary();
       return Unary(operator, right, token: _previous());
@@ -519,10 +530,7 @@ class Parser {
       if (_match([TokenType.LEFT_PAREN])) {
         expr = _finishCall(expr);
       } else if (_match([TokenType.DOT])) {
-        Token name = _consume(
-          TokenType.IDENTIFIER,
-          "Expect property name after '.'.",
-        )!;
+        Token name = _consume(TokenType.IDENTIFIER, "Expect property name after '.'.")!;
         expr = Get(expr, name, token: _previous());
       } else if (_match([TokenType.LEFT_BRACKET])) {
         Token bracket = _previous();
@@ -549,10 +557,7 @@ class Parser {
         arguments.add(_expression());
       } while (_match([TokenType.COMMA]));
     }
-    Token paren = _consume(
-      TokenType.RIGHT_PAREN,
-      "Expect ')' after arguments.",
-    )!;
+    Token paren = _consume(TokenType.RIGHT_PAREN, "Expect ')' after arguments.")!;
     return Call(callee, paren, arguments, token: _previous());
   }
 
@@ -609,10 +614,7 @@ class Parser {
     if (_match([TokenType.SUPER])) {
       Token keyword = _previous();
       _consume(TokenType.DOT, "Expect '.' after 'super'.");
-      Token method = _consume(
-        TokenType.IDENTIFIER,
-        "Expect superclass method name.",
-      )!;
+      Token method = _consume(TokenType.IDENTIFIER, "Expect superclass method name.")!;
       return Super(keyword, method, token: _previous());
     }
 
