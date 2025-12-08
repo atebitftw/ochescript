@@ -8,15 +8,13 @@
 #### Embedded script language for Flutter/Dart applications.
 
 ## Key Features
-OcheScript is an extensible, lightweight yet powerful scripting language designed for embedding into Dart/Flutter applications.
-
-*   **Convenient [Dart interop](https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md) Features.**
+*   **Convenient [Dart interop](https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md) Features:**
     * **Initialize OcheScript globals from Dart.**
-    * **Call Dart functions from OcheScript and get return values.**
+    * **Call Dart functions from OcheScript and get return values. Supports async calls.**
     * **Send values from OcheScript to Dart at any time.**
-*   **Extensible - Make It Your Own**
-    * **Define [extension methods](https://github.com/atebitftw/ochescript/blob/main/doc/native_methods.md) bound to supported types (many already included).**
-    * **Define [global functions](https://github.com/atebitftw/ochescript/blob/main/doc/native_functions.md) that can execute arbitrary Dart code (many already included).**
+*   **Extensible - Make It Your Own:**
+    * **[Native Methods](https://github.com/atebitftw/ochescript/blob/main/doc/native_methods.md) bound to supported types (many already included).**
+    * **[Native Functions](https://github.com/atebitftw/ochescript/blob/main/doc/native_functions.md) that can execute arbitrary Dart code (many already included).**
 *   **Object-Oriented Programming Features (classes, methods, properties, etc.).**
 *   **Closures and Lambdas.**
 *   **String Interpolation.**
@@ -25,6 +23,7 @@ OcheScript is an extensible, lightweight yet powerful scripting language designe
 *   **Lightweight Preprocessor Directive Capabilities.**
 *   **`.oche` Script File Syntax Highlighting Extension for VSCode/Antigravity.**
 *   **Comprehensive API and Language Documentation.**
+*   **Backed by years of actual production use in real-world business applications.**
 
 ## Hello World In OcheScript
 ```dart
@@ -38,23 +37,28 @@ Future<void> main() async {
 ```
 
 ## Getting Started
-See the [Getting Started](https://github.com/atebitftw/ochescript/blob/main/doc/getting_started.md) document for more information.
+See the [Getting Started](https://github.com/atebitftw/ochescript/blob/main/doc/getting_started.md) document to get up and running quickly.
 
 ## Language Specification
-See the [Language Specification](https://github.com/atebitftw/ochescript/blob/main/doc/language_specification.md) document for more information.
+See the [Language Specification](https://github.com/atebitftw/ochescript/blob/main/doc/language_specification.md) for a complete overview of the language features and capabilities.
 
 ## Library API
-See the [API](https://pub.dev/documentation/oche_script/latest/) document for more information.  This is an HTML document generated from the Dartdoc comments in the source code.
+The API is comprised three main components:
+1. Script running `compileAndRun`
+2. Native Function registration `registerNativeFunction`
+3. Native Method registration `registerNativeMethod`
+
+The API also exposes built-in native functions and methods, for reference.
+
+See the [API](https://pub.dev/documentation/oche_script/latest/).
 
 ## Dart Interop
-See the [Dart Interop](https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md) document for more information.
+See the [Dart Interop](https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md) to learn about all the ways that OcheScript can interact with your Dart code.
 
 ## Why Does This Exist?
-I work on some very large-scale Flutter projects that sometimes require a bit of dynamic runtime automation, and I found that I needed execute arbitrary code at runtime in certain situations.  I built OcheScript to meet this need.  In the Flutter/Dart ecosystem, there are probably five people that need this kind of thing, and I am one of them.  To the other four, I say: "Hello World!".
+I built OcheScript a while back to meet a need that I have on my larger Flutter projects to store and execute arbitrary code at runtime.  In the Flutter/Dart ecosystem, there are probably five people that need this kind of thing, and I am one of them.  To the other four, I say: "Hello World!".
 
-*Side Note: Dart technically does have arbitrary code execution capability via `dart:mirrors`, but I personally do not consider it to be a viable approach for many production application scenarios, especially anything Flutter-based (mirrors disallowed).  Another reason to avoid mirrors: As soon as you bring in mirrors, you lose tree-shaking.*
-
-## These Batteries Are Not Included
+## These Batteries Are Not Included:
 *   No module system (beyond `#INCLUDE` directive)
 *   No operator overloading.
 *   Map keys must be strings.
@@ -76,10 +80,10 @@ In [VS Code Extension](https://github.com/atebitftw/ochescript/tree/main/tool/vs
 You can find the compiled .vsix extension file in the bin/ directory of this project: [here](https://github.com/atebitftw/ochescript/tree/main/bin)
 
 ## About Me
-My name is John, and if you've been a Dart enthusiast prior to M1 (way before v1 release), then we are probably friends.
+My name is John, and if you've been a Dart enthusiast prior to M1 (way before v1 release), then we are probably friends.  I've been using OcheScript in production for years now, and it is my pleasure to now share it with the other four of you who will need it.
 
 ## Attributions and Gratitude
-The bones of this project are adapted from the excellent work of Bob Nystrom ([Github](https://github.com/munificent), [BlueSky](https://bsky.app/profile/stuffwithstuff.com)) in his book: "[Crafting Interpreters](https://craftinginterpreters.com/)", portions of which are licensed under the MIT License [see here](https://github.com/munificent/craftinginterpreters/blob/master/LICENSE).
+The bones of this project are adapted from the excellent work of **Robert Nystrom** ([Github](https://github.com/munificent), [BlueSky](https://bsky.app/profile/stuffwithstuff.com)) in his book: **"[Crafting Interpreters](https://craftinginterpreters.com/)**", portions of which are licensed under the MIT License [see here](https://github.com/munificent/craftinginterpreters/blob/master/LICENSE).
 
 I **highly** recommend this book if you are interested in learning how to build an interpreter.  It is a great resource.
 
