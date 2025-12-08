@@ -34,3 +34,12 @@ Public release.
 
 # 1.1.2
 - More documentation enhancements.
+
+# 1.1.3
+- Improved unhandled exceptions so that they report to the calling dart code via the returned map:
+```js
+{
+  "error": "message",
+  "return_code": 1
+}
+```
