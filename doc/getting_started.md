@@ -10,7 +10,7 @@ If you use **Flutter** ([flutter.dev](https://flutter.dev)), then you already ha
 Reference This Package In Your pubspec.yaml file.
 ```yaml
 dependencies:
-  oche_script: ^1.0.2
+  oche_script: any
 ```
 
 In your dart code, you can use it like this:
@@ -23,7 +23,7 @@ Future<void> main() async {
   final result = await oche.compileAndRun(script);
 }
 ```
-*The 'r' prefix on the string above is significant (a little Dart trick), because it allows you to use double quotes inside the string without escaping them.  You don't have to worry about this when you source your script files from files or asset bundles.*
+*The 'r' prefix on the string above is significant (a little Dart trick), because it allows you to use double quotes (or any character that usually requires escaping) inside the string without escaping them.  You don't have to worry about this when you source your script files from files or asset bundles.*
 
 
 ## CLI Installation
