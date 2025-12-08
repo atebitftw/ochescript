@@ -17,13 +17,9 @@ OcheScript is a lightweight, dynamically typed, object-oriented, scripting langu
 *   Closures and lambdas.
 *   (Limited) Asynchronous support (async/await).
 *   String interpolation.
+*   Try/catch exception handling.
 *   Lightweight preprocessor directive capabilities.
 *   `.oche` script file syntax highlighting extension for VSCode/Antigravity.
-
-## Why Does This Exist?
-I work on some very large-scale Flutter projects that sometimes require a bit of dynamic runtime automation, and I found that I needed execute arbitrary code at runtime in certain situations.  I built OcheScript to meet this need.  In the Flutter/Dart ecosystem, there are probably five people that need this kind of thing, and I am one of them.  To the other four, I say: "Hello World!".
-
-*Side Note: Dart technically does have arbitrary code execution capability via `dart:mirrors`, but I personally do not consider it to be a viable approach for many production application scenarios, especially anything Flutter-based (mirrors disallowed).  Another reason to avoid mirrors: As soon as you bring in mirrors, you lose tree-shaking.*
 
 ## Hello World In OcheScript
 *In a text file with extension `.oche`*
@@ -53,8 +49,13 @@ See the [API](https://github.com/atebitftw/ochescript/tree/main/doc/api) documen
 ## Dart Interop
 See the [Dart Interop](https://github.com/atebitftw/ochescript/blob/main/doc/dart_interop.md) document for more information.
 
+## Why Does This Exist?
+I work on some very large-scale Flutter projects that sometimes require a bit of dynamic runtime automation, and I found that I needed execute arbitrary code at runtime in certain situations.  I built OcheScript to meet this need.  In the Flutter/Dart ecosystem, there are probably five people that need this kind of thing, and I am one of them.  To the other four, I say: "Hello World!".
+
+*Side Note: Dart technically does have arbitrary code execution capability via `dart:mirrors`, but I personally do not consider it to be a viable approach for many production application scenarios, especially anything Flutter-based (mirrors disallowed).  Another reason to avoid mirrors: As soon as you bring in mirrors, you lose tree-shaking.*
+
 ## Error Handling
-Runtime errors cause script execution to halt with an error message.
+Unless captured in a `try/catch` block, runtime errors cause script execution to halt with an error message.
 
 Errors are not emitted to stdout by default.  They are usually reported via the [Logging Package](https://pub.dev/packages/logging) at level WARNING and above.  To listen to these errors, you can use the `Logging` class from the `logging` package.
 
@@ -104,7 +105,6 @@ Runtime error: [my_lib:42] Undefined variable 'foo'.
 This is useful for debugging scripts that are composed of multiple files.
 
 ## These Batteries Are Not Included
-*   No try/catch exception handling.
 *   No module system (beyond `#INCLUDE` directive)
 *   No operator overloading.
 *   Map keys must be strings.

@@ -253,5 +253,32 @@ void main() {
       expect(state['return_code'], 0);
       expect(state['caught'], "Error: 404 - Not Found");
     });
+
+    test('Catching general runtime error', () async {
+      final script = '''
+        var result = "none";
+        try {
+          var x = 1 + "string"; // Should cause runtime error (ADD type check) - wait, 1+"s" is valid string concat in this language?
+          // Let's use something definitely invalid, like null + null if not supported, or 1 + null
+          // Looking at VM.dart: 
+          // add: if (a is num && b is num) ... else if (a is String || b is String) ... is valid.
+          // Let's try 1 / "string" -> divide op.
+          var y = 1 / "string"; 
+        } catch (e) {
+          result = "caught";
+        }
+        out("result", result);
+      ''';
+
+      final vm = VM();
+      final state = await vm.interpret(
+        BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()),
+      );
+
+      // If caught, return code should be 0 and result "caught".
+      // If not caught (current behavior likely), return code 1, error logged.
+      expect(state['return_code'], 0, reason: "Runtime error was not caught");
+      expect(state['result'], "caught");
+    });
   });
 }

@@ -136,807 +136,874 @@ class VM {
     return RuntimeError.withLine(line, message);
   }
 
+  void _runtimeError(String message) {
+    // Treat runtime errors as string exceptions for now
+    final exception = message;
+    final currentLine = getCurrentLine();
+    bool handled = false;
+
+    // Iterate through frames to find a handler
+    while (_frames.isNotEmpty) {
+      final f = _frames.last;
+      if (f.handlers.isNotEmpty) {
+        final handler = f.handlers.removeLast();
+        _closeUpvalues(handler.stackHeight);
+        _sp = handler.stackHeight;
+        f.ip = handler.catchIp;
+        push(exception);
+        // frame = f; // Not needed as we update _frames directly, caller needs to refresh frame
+        handled = true;
+        break;
+      }
+
+      _closeUpvalues(f.slots);
+      _frames.removeLast();
+    }
+
+    if (handled) {
+      // If we found a handler, we just return. The loop in _run needs to refresh its 'frame' reference.
+      // Since we modified _frames, the next iteration of _run loop will pick up the correct frame.
+      // If we found a handler, we just return. The loop in _run needs to refresh its 'frame' reference.
+      // Since we modified _frames, the next iteration of _run loop will pick up the correct frame.
+      throw _CaughtException();
+    }
+
+    // If unhandled, halt execution and throw pure Dart exception to stop _run loop
+    _isRunning = false;
+    halt = true;
+    throw reportRuntimeError(currentLine, "Unhandled exception: $exception");
+  }
+
   Future<void> _run([int targetFrameCount = 0]) async {
     _isRunning = true;
     CallFrame frame = _frames.last;
 
     while (!halt && _frames.length > targetFrameCount) {
-      // Fetch
-      if (frame.ip >= frame.chunk.code.length) {
-        // Implicit return if we run off the end
-        if (_frames.length == 1) return;
+      try {
+        // Fetch
+        if (frame.ip >= frame.chunk.code.length) {
+          // Implicit return if we run off the end
+          if (_frames.length == 1) return;
 
-        // Restore previous frame
-        _frames.removeLast();
-        if (_frames.length <= targetFrameCount) return;
-        frame = _frames.last;
-        continue;
-      }
-
-      final instruction = OpCode.values[frame.chunk.code[frame.ip++]];
-
-      // Decode & Execute - inline for performance
-      switch (instruction) {
-        case OpCode.constant:
-          final constantIndex = frame.chunk.code[frame.ip++];
-          final constant = frame.chunk.constants[constantIndex];
-          push(constant);
-          break;
-
-        case OpCode.nil:
-          push(null);
-          break;
-
-        case OpCode.trueOp:
-          push(true);
-          break;
-
-        case OpCode.falseOp:
-          push(false);
-          break;
-
-        case OpCode.pop:
-          pop();
-          break;
-
-        case OpCode.getLocal:
-          final slot = frame.chunk.code[frame.ip++];
-          push(_stack[frame.slots + slot]);
-          break;
-
-        case OpCode.setLocal:
-          final slot = frame.chunk.code[frame.ip++];
-          _stack[frame.slots + slot] = peek(0);
-          break;
-
-        case OpCode.incLocal:
-          final slot = frame.chunk.code[frame.ip++];
-          final val = _stack[frame.slots + slot];
-          if (val is num) {
-            _stack[frame.slots + slot] = val + 1;
-          } else {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Operand must be a number.",
-            );
-          }
-          break;
-
-        case OpCode.decLocal:
-          final slot = frame.chunk.code[frame.ip++];
-          final val = _stack[frame.slots + slot];
-          if (val is num) {
-            _stack[frame.slots + slot] = val - 1;
-          } else {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Operand must be a number.",
-            );
-          }
-          break;
-
-        case OpCode.tryOp:
-          final offset =
-              (frame.chunk.code[frame.ip] << 8) |
-              frame.chunk.code[frame.ip + 1];
-          frame.ip += 2;
-          final catchIp = frame.ip + offset;
-          frame.handlers.add(ExceptionHandler(catchIp, _sp));
-          break;
-
-        case OpCode.endTryOp:
-          frame.handlers.removeLast();
-          break;
-
-        case OpCode.throwOp:
-          final exception = pop();
-          // if (exception is! String) {
-          //   throw reportRuntimeError(getCurrentLine(), "Throw argument must be a string.");
-          // }
-
-          final currentLine = getCurrentLine();
-          bool handled = false;
-
-          // We need to iterate through frames to find a handler.
-          // We can't use the 'frame' variable directly for iteration because it's cached.
-          // We modify _frames directly.
-
-          while (_frames.isNotEmpty) {
-            final f = _frames.last;
-            if (f.handlers.isNotEmpty) {
-              final handler = f.handlers.removeLast();
-              _closeUpvalues(handler.stackHeight);
-              _sp = handler.stackHeight;
-              f.ip = handler.catchIp;
-              push(exception);
-              frame = f; // Update cached frame
-              handled = true;
-              break;
-            }
-
-            _closeUpvalues(f.slots);
-            _frames.removeLast();
-          }
-
-          if (handled) {
-            break;
-          }
-
-          // If we are here, it means we unwound everything and didn't find a handler.
-          _isRunning = false;
-          halt = true;
-          throw reportRuntimeError(
-            currentLine,
-            "Unhandled exception: $exception",
-          );
-
-        case OpCode.getGlobal:
-          final nameIndex = frame.chunk.code[frame.ip++];
-          final name = frame.chunk.constants[nameIndex] as String;
-          if (!_globals.containsKey(name)) {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Undefined variable '$name'.",
-            );
-          }
-          push(_globals[name]);
-          break;
-
-        case OpCode.defineGlobal:
-          final nameIndex = frame.chunk.code[frame.ip++];
-          final name = frame.chunk.constants[nameIndex] as String;
-          _globals[name] = pop();
-          break;
-
-        case OpCode.setGlobal:
-          final nameIndex = frame.chunk.code[frame.ip++];
-          final name = frame.chunk.constants[nameIndex] as String;
-          if (!_globals.containsKey(name)) {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Undefined variable '$name'.",
-            );
-          }
-          _globals[name] = peek(0);
-          break;
-
-        case OpCode.getUpValue:
-          final slot = frame.chunk.code[frame.ip++];
-          final upvalue = frame.closure.upvalues[slot];
-          if (upvalue.isClosed) {
-            push(upvalue.closed);
-          } else {
-            push(_stack[upvalue.location]);
-          }
-          break;
-
-        case OpCode.setUpValue:
-          final slot = frame.chunk.code[frame.ip++];
-          final upvalue = frame.closure.upvalues[slot];
-          if (upvalue.isClosed) {
-            upvalue.closed = peek(0);
-          } else {
-            _stack[upvalue.location] = peek(0);
-          }
-          break;
-
-        case OpCode.equal:
-          final b = pop();
-          final a = pop();
-          push(a == b);
-          break;
-
-        case OpCode.notEqual:
-          final b = pop();
-          final a = pop();
-          push(a != b);
-          break;
-
-        case OpCode.greater:
-          final b = pop() as num;
-          final a = pop() as num;
-          push(a > b);
-          break;
-
-        case OpCode.less:
-          final b = pop() as num;
-          final a = pop() as num;
-          push(a < b);
-          break;
-
-        case OpCode.add:
-          final b = pop();
-          final a = pop();
-          if (a is num && b is num) {
-            push(a + b);
-          } else if (a is DateTime && b is Duration) {
-            push(a.add(b));
-          } else if (a is Duration && b is Duration) {
-            push(a + b);
-          } else if (a is String && b is String) {
-            push(a + b);
-          } else if (a is String) {
-            push(a + b.toString());
-          } else if (b is String) {
-            push(a.toString() + b);
-          } else if (a is List && b is List) {
-            push([...a, ...b]);
-          } else if (a is Map && b is Map) {
-            a.addAll(b);
-            push(a);
-          } else {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "ADD: Invalid operands: (${a.runtimeType}, ${b.runtimeType})",
-            );
-          }
-          break;
-
-        case OpCode.subtract:
-          final b = pop();
-          final a = pop();
-          if (a is num && b is num) {
-            push(a - b);
-          } else if (a is DateTime && b is DateTime) {
-            push(a.difference(b));
-          } else if (a is DateTime && b is Duration) {
-            push(a.subtract(b));
-          } else if (a is Duration && b is Duration) {
-            push(a - b);
-          } else {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "SUBTRACT: Invalid operands: (${a.runtimeType}, ${b.runtimeType})",
-            );
-          }
-          break;
-
-        case OpCode.multiply:
-          final b = pop() as num;
-          final a = pop() as num;
-          push(a * b);
-          break;
-
-        case OpCode.divide:
-          final b = pop() as num;
-          final a = pop() as num;
-          push(a / b);
-          break;
-
-        case OpCode.modulo:
-          final b = pop() as num;
-          final a = pop() as num;
-          push(a % b);
-          break;
-
-        case OpCode.not:
-          push(_isFalsey(pop()));
-          break;
-
-        case OpCode.negate:
-          final a = pop() as num;
-          push(-a);
-          break;
-
-        case OpCode.printOp:
-          print(pop());
-          break;
-
-        case OpCode.outOp:
-          final nameIndex = frame.chunk.code[frame.ip++];
-          final name = frame.chunk.constants[nameIndex] as String;
-          final value = pop();
-
-          if (value != null) {
-            _outState[name] = value;
-          }
-
-          if (_outCallback != null) {
-            _outCallback!(name, value);
-          }
-          break;
-
-        case OpCode.jumpOp:
-          final offset =
-              (frame.chunk.code[frame.ip] << 8) |
-              frame.chunk.code[frame.ip + 1];
-          frame.ip += 2;
-          frame.ip += offset;
-          break;
-
-        case OpCode.jumpIfFalse:
-          final offset =
-              (frame.chunk.code[frame.ip] << 8) |
-              frame.chunk.code[frame.ip + 1];
-          frame.ip += 2;
-          if (_isFalsey(peek(0))) {
-            frame.ip += offset;
-          }
-          break;
-
-        case OpCode.loop:
-          final offset =
-              (frame.chunk.code[frame.ip] << 8) |
-              frame.chunk.code[frame.ip + 1];
-          frame.ip += 2;
-          frame.ip -= offset;
-          break;
-
-        case OpCode.callOp:
-          final argCount = frame.chunk.code[frame.ip++];
-          await _callValue(peek(argCount), argCount);
-          frame = _frames.last; // Frame might have changed
-          break;
-
-        case OpCode.invoke:
-          final method =
-              frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
-          final argCount = frame.chunk.code[frame.ip++];
-          await _invoke(method, argCount);
-          frame = _frames.last; // Frame might have changed
-          break;
-
-        case OpCode.superInvoke:
-          final method =
-              frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
-          final argCount = frame.chunk.code[frame.ip++];
-          final superclass = pop() as ObjClass;
-          await _invokeSuper(method, argCount, superclass);
-          frame = _frames.last; // Frame might have changed
-          break;
-
-        case OpCode.listAppend:
-          final item = peek(0);
-          final receiver = peek(1);
-          if (receiver is List) {
-            receiver.add(item);
-            pop(); // item
-            pop(); // receiver
-            push(receiver.length);
-          } else {
-            await _invoke("add", 1);
-            frame = _frames.last; // Frame might have changed
-          }
-          break;
-
-        case OpCode.closure:
-          final constantIndex = frame.chunk.code[frame.ip++];
-          final function = frame.chunk.constants[constantIndex] as ObjFunction;
-
-          final upvalues = <ObjUpvalue>[];
-          for (int i = 0; i < function.upvalues.length; i++) {
-            final isLocal = frame.chunk.code[frame.ip++] == 1;
-            final index = frame.chunk.code[frame.ip++];
-            if (isLocal) {
-              upvalues.add(_captureUpvalue(frame.slots + index));
-            } else {
-              upvalues.add(frame.closure.upvalues[index]);
-            }
-          }
-
-          push(ObjClosure(function, upvalues));
-          break;
-
-        case OpCode.closeUpValue:
-          _closeUpvalues(_sp - 1);
-          pop();
-          break;
-
-        case OpCode.returnOp:
-          final result = pop();
-          _closeUpvalues(frame.slots);
-
-          // Check if we're returning from an init method BEFORE removing the frame
-          final isInit = frame.closure.function.name == "init";
-          final returnSlots = frame.slots;
-
+          // Restore previous frame
           _frames.removeLast();
-          if (_frames.isEmpty) {
-            pop(); // Pop the script closure
-            return;
-          }
-
-          _sp = returnSlots; // Discard locals
-          if (isInit) {
-            // For init methods, return the instance (which is at slot 0)
-            push(_stack[returnSlots]);
-          } else {
-            push(result);
-          }
-
           if (_frames.length <= targetFrameCount) return;
           frame = _frames.last;
-          break;
+          continue;
+        }
 
-        case OpCode.buildList:
-          final count = frame.chunk.code[frame.ip++];
-          final list = <dynamic>[];
-          for (int i = 0; i < count; i++) {
-            list.insert(0, pop());
-          }
-          push(list);
-          break;
+        final instruction = OpCode.values[frame.chunk.code[frame.ip++]];
 
-        case OpCode.buildMap:
-          final count = frame.chunk.code[frame.ip++];
-          final map = <String, dynamic>{};
-          for (int i = 0; i < count; i++) {
-            final value = pop();
-            final key = pop();
-            map[key as String] = value;
-          }
-          push(map);
-          break;
-
-        case OpCode.indexGet:
-          final index = pop();
-          final target = pop();
-
-          if (target is List) {
-            if (index is! int) {
-              throw reportRuntimeError(
-                getCurrentLine(),
-                "List index must be an integer.",
-              );
-            }
-            if (index < 0 || index >= target.length) {
-              throw reportRuntimeError(
-                getCurrentLine(),
-                "List index out of bounds.",
-              );
-            }
-            push(target[index]);
-          } else if (target is Map) {
-            if (index is! String) {
-              throw reportRuntimeError(
-                getCurrentLine(),
-                "Map key must be a string.",
-              );
-            }
-            if (!target.containsKey(index)) {
-              throw reportRuntimeError(
-                getCurrentLine(),
-                "Map key '$index' not found.",
-              );
-            }
-            push(target[index]);
-          } else if (target is String) {
-            if (index is! int) {
-              throw reportRuntimeError(
-                getCurrentLine(),
-                "String index must be an integer.",
-              );
-            }
-            if (index < 0 || index >= target.length) {
-              throw reportRuntimeError(
-                getCurrentLine(),
-                "String index out of bounds.",
-              );
-            }
-            push(target[index]);
-          } else {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Can only index lists, maps, and strings.",
-            );
-          }
-          break;
-
-        case OpCode.indexSet:
-          final value = pop();
-          final index = pop();
-          final target = pop();
-
-          if (target is List) {
-            if (index is! int) {
-              throw reportRuntimeError(
-                getCurrentLine(),
-                "List index must be an integer.",
-              );
-            }
-            if (index < 0 || index >= target.length) {
-              throw reportRuntimeError(
-                getCurrentLine(),
-                "List index out of bounds.",
-              );
-            }
-            target[index] = value;
-          } else if (target is Map) {
-            if (index is! String) {
-              throw reportRuntimeError(
-                getCurrentLine(),
-                "Map key must be a string.",
-              );
-            }
-            target[index] = value;
-          } else {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Can only set index on lists and maps.",
-            );
-          }
-          push(value); // Assignment expression evaluates to the assigned value
-          break;
-
-        case OpCode.classOp:
-          final nameIndex = frame.chunk.code[frame.ip++];
-          final name = frame.chunk.constants[nameIndex] as String;
-          push(ObjClass(name));
-          break;
-
-        case OpCode.inherit:
-          final superclass = peek(0);
-          if (superclass is! ObjClass) {
-            throw RuntimeError.withLine(
-              getCurrentLine(),
-              "Superclass must be a class.",
-            );
-          }
-          final subclass = peek(1) as ObjClass;
-          subclass.superclass = superclass;
-          subclass.methods.addAll(superclass.methods);
-          // Don't pop superclass - it stays on stack as the "super" local value
-          break;
-
-        case OpCode.method:
-          final nameIndex = frame.chunk.code[frame.ip++];
-          final name = frame.chunk.constants[nameIndex] as String;
-          final method = peek(0) as ObjClosure;
-          // Find the class - it might be at peek(1) or peek(2) depending on whether
-          // there's a superclass on the stack.
-          // If we have [subclass, superclass, method], peek(1) is superclass and peek(2) is subclass.
-          // We want to define the method on the subclass.
-          ObjClass? klass;
-          final p1 = peek(1);
-          final p2 = _sp > 2 ? peek(2) : null;
-
-          if (p2 is ObjClass && p1 is ObjClass && p2.superclass == p1) {
-            klass = p2;
-          } else if (p1 is ObjClass) {
-            klass = p1;
-          }
-
-          if (klass == null) {
-            throw RuntimeError.withLine(
-              getCurrentLine(),
-              "Could not find class for method definition.",
-            );
-          }
-          klass.methods[name] = method;
-          pop(); // Pop method
-          break;
-
-        case OpCode.getProperty:
-          final nameIndex = frame.chunk.code[frame.ip++];
-          final name = frame.chunk.constants[nameIndex] as String;
-          final receiver = peek(0);
-
-          if (receiver is ObjInstance) {
-            if (name == "fields") {
-              pop();
-              push(receiver.fields);
-              break;
-            }
-
-            if (receiver.fields.containsKey(name)) {
-              pop();
-              push(receiver.fields[name]);
-              break;
-            }
-
-            final method = receiver.klass.methods[name];
-            if (method != null) {
-              pop();
-              push(ObjBoundMethod(receiver, method));
-              break;
-            }
-
-            throw RuntimeError.withLine(
-              getCurrentLine(),
-              "Undefined property '$name'.",
-            );
-          }
-
-          final nativeMethod = _getNativeMethod(receiver, name);
-          if (nativeMethod != null) {
-            pop();
-            push(nativeMethod);
+        // Decode & Execute - inline for performance
+        switch (instruction) {
+          case OpCode.constant:
+            final constantIndex = frame.chunk.code[frame.ip++];
+            final constant = frame.chunk.constants[constantIndex];
+            push(constant);
             break;
-          }
 
-          throw RuntimeError.withLine(
-            getCurrentLine(),
-            "Only instances have properties. $receiver (${receiver.runtimeType})",
-          );
-
-        case OpCode.setProperty:
-          final nameIndex = frame.chunk.code[frame.ip++];
-          final name = frame.chunk.constants[nameIndex] as String;
-          final value = pop();
-          final receiver = peek(0);
-
-          if (receiver is ObjInstance) {
-            if (name == "fields") {
-              throw reportRuntimeError(
-                getCurrentLine(),
-                "Cannot assign to reserved property 'fields'.",
-              );
-            }
-            receiver.fields[name] = value;
-            pop();
-            push(value);
+          case OpCode.nil:
+            push(null);
             break;
-          }
 
-          throw reportRuntimeError(
-            getCurrentLine(),
-            "Only instances have fields. Got ${receiver.runtimeType} instead.",
-          );
+          case OpCode.trueOp:
+            push(true);
+            break;
 
-        case OpCode.getSuper:
-          final nameIndex = frame.chunk.code[frame.ip++];
-          final name = frame.chunk.constants[nameIndex] as String;
-          final superValue = pop();
-          if (superValue is! ObjClass) {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "GET_SUPER expected ObjClass but got ${superValue.runtimeType}. Looking for method '$name'.",
-            );
-          }
-          final superclass = superValue;
-          final receiverValue = peek(0);
-          if (receiverValue is! ObjInstance) {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "GET_SUPER expected ObjInstance receiver but got ${receiverValue.runtimeType}.",
-            );
-          }
-          final receiver = receiverValue;
+          case OpCode.falseOp:
+            push(false);
+            break;
 
-          final method = superclass.methods[name];
-          if (method == null) {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Undefined property '$name'.",
-            );
-          }
-
-          pop();
-          push(ObjBoundMethod(receiver, method));
-          break;
-
-        case OpCode.awaitOp:
-          final future = peek(0);
-          if (future is Future) {
-            final result = await future;
+          case OpCode.pop:
             pop();
-            push(result);
-          }
-          break;
+            break;
 
-        case OpCode.isOp:
-          final type = pop();
-          final value = pop();
-          if (type is String) {
-            if (type == "num") {
-              push(value is num);
-            } else if (type == "bool") {
-              push(value is bool);
-            } else if (type == "string") {
-              push(value is String);
-            } else if (type == "list") {
-              push(value is List);
-            } else if (type == "map") {
-              push(value is Map);
-            } else if (type == "date") {
-              push(value is DateTime);
-            } else if (type == "duration") {
-              push(value is Duration);
+          case OpCode.getLocal:
+            final slot = frame.chunk.code[frame.ip++];
+            push(_stack[frame.slots + slot]);
+            break;
+
+          case OpCode.setLocal:
+            final slot = frame.chunk.code[frame.ip++];
+            _stack[frame.slots + slot] = peek(0);
+            break;
+
+          case OpCode.incLocal:
+            final slot = frame.chunk.code[frame.ip++];
+            final val = _stack[frame.slots + slot];
+            if (val is num) {
+              _stack[frame.slots + slot] = val + 1;
             } else {
-              push(false);
+              _runtimeError("Operand must be a number.");
+              frame = _frames.last;
+              break;
             }
-          } else if (type is ObjClass) {
-            if (value is ObjInstance) {
-              ObjClass? k = value.klass;
-              bool found = false;
-              while (k != null) {
-                if (k == type) {
-                  found = true;
-                  break;
-                }
-                k = k.superclass;
+            break;
+
+          case OpCode.decLocal:
+            final slot = frame.chunk.code[frame.ip++];
+            final val = _stack[frame.slots + slot];
+            if (val is num) {
+              _stack[frame.slots + slot] = val - 1;
+            } else {
+              _runtimeError("Operand must be a number.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.tryOp:
+            final offset =
+                (frame.chunk.code[frame.ip] << 8) |
+                frame.chunk.code[frame.ip + 1];
+            frame.ip += 2;
+            final catchIp = frame.ip + offset;
+            frame.handlers.add(ExceptionHandler(catchIp, _sp));
+            break;
+
+          case OpCode.endTryOp:
+            frame.handlers.removeLast();
+            break;
+
+          case OpCode.throwOp:
+            final exception = pop();
+            // if (exception is! String) {
+            //   throw reportRuntimeError(getCurrentLine(), "Throw argument must be a string.");
+            // }
+
+            final currentLine = getCurrentLine();
+            bool handled = false;
+
+            // We need to iterate through frames to find a handler.
+            // We can't use the 'frame' variable directly for iteration because it's cached.
+            // We modify _frames directly.
+
+            while (_frames.isNotEmpty) {
+              final f = _frames.last;
+              if (f.handlers.isNotEmpty) {
+                final handler = f.handlers.removeLast();
+                _closeUpvalues(handler.stackHeight);
+                _sp = handler.stackHeight;
+                f.ip = handler.catchIp;
+                push(exception);
+                frame = f; // Update cached frame
+                handled = true;
+                break;
               }
-              push(found);
-            } else {
-              push(false);
+
+              _closeUpvalues(f.slots);
+              _frames.removeLast();
             }
-          } else {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Invalid type operand for 'is'.",
-            );
-          }
-          break;
 
-        case OpCode.bitAnd:
-          final b = pop();
-          final a = pop();
-          if (a is int && b is int) {
-            push(a & b);
-          } else {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Operands must be integers.",
-            );
-          }
-          break;
+            if (handled) {
+              break;
+            }
 
-        case OpCode.bitOr:
-          final b = pop();
-          final a = pop();
-          if (a is int && b is int) {
-            push(a | b);
-          } else {
+            // If we are here, it means we unwound everything and didn't find a handler.
+            _isRunning = false;
+            halt = true;
             throw reportRuntimeError(
-              getCurrentLine(),
-              "Operands must be integers.",
+              currentLine,
+              "Unhandled exception: $exception",
             );
-          }
-          break;
 
-        case OpCode.bitXor:
-          final b = pop();
-          final a = pop();
-          if (a is int && b is int) {
-            push(a ^ b);
-          } else {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Operands must be integers.",
+          case OpCode.getGlobal:
+            final nameIndex = frame.chunk.code[frame.ip++];
+            final name = frame.chunk.constants[nameIndex] as String;
+            if (!_globals.containsKey(name)) {
+              _runtimeError("Undefined variable '$name'.");
+              frame = _frames.last;
+              break;
+            }
+            push(_globals[name]);
+            break;
+
+          case OpCode.defineGlobal:
+            final nameIndex = frame.chunk.code[frame.ip++];
+            final name = frame.chunk.constants[nameIndex] as String;
+            _globals[name] = pop();
+            break;
+
+          case OpCode.setGlobal:
+            final nameIndex = frame.chunk.code[frame.ip++];
+            final name = frame.chunk.constants[nameIndex] as String;
+            if (!_globals.containsKey(name)) {
+              _runtimeError("Undefined variable '$name'.");
+              frame = _frames.last;
+              break;
+            }
+            _globals[name] = peek(0);
+            break;
+
+          case OpCode.getUpValue:
+            final slot = frame.chunk.code[frame.ip++];
+            final upvalue = frame.closure.upvalues[slot];
+            if (upvalue.isClosed) {
+              push(upvalue.closed);
+            } else {
+              push(_stack[upvalue.location]);
+            }
+            break;
+
+          case OpCode.setUpValue:
+            final slot = frame.chunk.code[frame.ip++];
+            final upvalue = frame.closure.upvalues[slot];
+            if (upvalue.isClosed) {
+              upvalue.closed = peek(0);
+            } else {
+              _stack[upvalue.location] = peek(0);
+            }
+            break;
+
+          case OpCode.equal:
+            final b = pop();
+            final a = pop();
+            push(a == b);
+            break;
+
+          case OpCode.notEqual:
+            final b = pop();
+            final a = pop();
+            push(a != b);
+            break;
+
+          case OpCode.greater:
+            final b = pop();
+            final a = pop();
+            if (a is num && b is num) {
+              push(a > b);
+            } else {
+              _runtimeError("Operands must be numbers.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.less:
+            final b = pop();
+            final a = pop();
+            if (a is num && b is num) {
+              push(a < b);
+            } else {
+              _runtimeError("Operands must be numbers.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.add:
+            final b = pop();
+            final a = pop();
+            if (a is num && b is num) {
+              push(a + b);
+            } else if (a is DateTime && b is Duration) {
+              push(a.add(b));
+            } else if (a is Duration && b is Duration) {
+              push(a + b);
+            } else if (a is String && b is String) {
+              push(a + b);
+            } else if (a is String) {
+              push(a + b.toString());
+            } else if (b is String) {
+              push(a.toString() + b);
+            } else if (a is List && b is List) {
+              push([...a, ...b]);
+            } else if (a is Map && b is Map) {
+              a.addAll(b);
+              push(a);
+            } else {
+              _runtimeError(
+                "ADD: Invalid operands: (${a.runtimeType}, ${b.runtimeType})",
+              );
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.subtract:
+            final b = pop();
+            final a = pop();
+            if (a is num && b is num) {
+              push(a - b);
+            } else if (a is DateTime && b is DateTime) {
+              push(a.difference(b));
+            } else if (a is DateTime && b is Duration) {
+              push(a.subtract(b));
+            } else if (a is Duration && b is Duration) {
+              push(a - b);
+            } else {
+              _runtimeError(
+                "SUBTRACT: Invalid operands: (${a.runtimeType}, ${b.runtimeType})",
+              );
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.multiply:
+            final b = pop();
+            final a = pop();
+            if (a is num && b is num) {
+              push(a * b);
+            } else {
+              _runtimeError("Operands must be numbers.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.divide:
+            final b = pop();
+            final a = pop();
+            if (a is num && b is num) {
+              push(a / b);
+            } else {
+              _runtimeError("Operands must be numbers.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.modulo:
+            final b = pop();
+            final a = pop();
+            if (a is num && b is num) {
+              push(a % b);
+            } else {
+              _runtimeError("Operands must be numbers.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.not:
+            push(_isFalsey(pop()));
+            break;
+
+          case OpCode.negate:
+            final a = pop();
+            if (a is num) {
+              push(-a);
+            } else {
+              _runtimeError("Operand must be a number.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.printOp:
+            print(pop());
+            break;
+
+          case OpCode.outOp:
+            final nameIndex = frame.chunk.code[frame.ip++];
+            final name = frame.chunk.constants[nameIndex] as String;
+            final value = pop();
+
+            if (value != null) {
+              _outState[name] = value;
+            }
+
+            if (_outCallback != null) {
+              _outCallback!(name, value);
+            }
+            break;
+
+          case OpCode.jumpOp:
+            final offset =
+                (frame.chunk.code[frame.ip] << 8) |
+                frame.chunk.code[frame.ip + 1];
+            frame.ip += 2;
+            frame.ip += offset;
+            break;
+
+          case OpCode.jumpIfFalse:
+            final offset =
+                (frame.chunk.code[frame.ip] << 8) |
+                frame.chunk.code[frame.ip + 1];
+            frame.ip += 2;
+            if (_isFalsey(peek(0))) {
+              frame.ip += offset;
+            }
+            break;
+
+          case OpCode.loop:
+            final offset =
+                (frame.chunk.code[frame.ip] << 8) |
+                frame.chunk.code[frame.ip + 1];
+            frame.ip += 2;
+            frame.ip -= offset;
+            break;
+
+          case OpCode.callOp:
+            final argCount = frame.chunk.code[frame.ip++];
+            await _callValue(peek(argCount), argCount);
+            frame = _frames.last; // Frame might have changed
+            break;
+
+          case OpCode.invoke:
+            final method =
+                frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
+            final argCount = frame.chunk.code[frame.ip++];
+            await _invoke(method, argCount);
+            frame = _frames.last; // Frame might have changed
+            break;
+
+          case OpCode.superInvoke:
+            final method =
+                frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
+            final argCount = frame.chunk.code[frame.ip++];
+            final superclass = pop() as ObjClass;
+            await _invokeSuper(method, argCount, superclass);
+            frame = _frames.last; // Frame might have changed
+            break;
+
+          case OpCode.listAppend:
+            final item = peek(0);
+            final receiver = peek(1);
+            if (receiver is List) {
+              receiver.add(item);
+              pop(); // item
+              pop(); // receiver
+              push(receiver.length);
+            } else {
+              await _invoke("add", 1);
+              frame = _frames.last; // Frame might have changed
+            }
+            break;
+
+          case OpCode.closure:
+            final constantIndex = frame.chunk.code[frame.ip++];
+            final function =
+                frame.chunk.constants[constantIndex] as ObjFunction;
+
+            final upvalues = <ObjUpvalue>[];
+            for (int i = 0; i < function.upvalues.length; i++) {
+              final isLocal = frame.chunk.code[frame.ip++] == 1;
+              final index = frame.chunk.code[frame.ip++];
+              if (isLocal) {
+                upvalues.add(_captureUpvalue(frame.slots + index));
+              } else {
+                upvalues.add(frame.closure.upvalues[index]);
+              }
+            }
+
+            push(ObjClosure(function, upvalues));
+            break;
+
+          case OpCode.closeUpValue:
+            _closeUpvalues(_sp - 1);
+            pop();
+            break;
+
+          case OpCode.returnOp:
+            final result = pop();
+            _closeUpvalues(frame.slots);
+
+            // Check if we're returning from an init method BEFORE removing the frame
+            final isInit = frame.closure.function.name == "init";
+            final returnSlots = frame.slots;
+
+            _frames.removeLast();
+            if (_frames.isEmpty) {
+              pop(); // Pop the script closure
+              return;
+            }
+
+            _sp = returnSlots; // Discard locals
+            if (isInit) {
+              // For init methods, return the instance (which is at slot 0)
+              push(_stack[returnSlots]);
+            } else {
+              push(result);
+            }
+
+            if (_frames.length <= targetFrameCount) return;
+            frame = _frames.last;
+            break;
+
+          case OpCode.buildList:
+            final count = frame.chunk.code[frame.ip++];
+            final list = <dynamic>[];
+            for (int i = 0; i < count; i++) {
+              list.insert(0, pop());
+            }
+            push(list);
+            break;
+
+          case OpCode.buildMap:
+            final count = frame.chunk.code[frame.ip++];
+            final map = <String, dynamic>{};
+            for (int i = 0; i < count; i++) {
+              final value = pop();
+              final key = pop();
+              map[key as String] = value;
+            }
+            push(map);
+            break;
+
+          case OpCode.indexGet:
+            final index = pop();
+            final target = pop();
+
+            if (target is List) {
+              if (index is! int) {
+                throw reportRuntimeError(
+                  getCurrentLine(),
+                  "List index must be an integer.",
+                );
+              }
+              if (index < 0 || index >= target.length) {
+                _runtimeError("List index out of bounds.");
+                frame = _frames.last;
+                break;
+              }
+              push(target[index]);
+            } else if (target is Map) {
+              if (index is! String) {
+                throw reportRuntimeError(
+                  getCurrentLine(),
+                  "Map key must be a string.",
+                );
+              }
+              if (!target.containsKey(index)) {
+                throw reportRuntimeError(
+                  getCurrentLine(),
+                  "Map key '$index' not found.",
+                );
+              }
+              push(target[index]);
+            } else if (target is String) {
+              if (index is! int) {
+                throw reportRuntimeError(
+                  getCurrentLine(),
+                  "String index must be an integer.",
+                );
+              }
+              if (index < 0 || index >= target.length) {
+                throw reportRuntimeError(
+                  getCurrentLine(),
+                  "String index out of bounds.",
+                );
+              }
+              push(target[index]);
+            } else {
+              throw reportRuntimeError(
+                getCurrentLine(),
+                "Can only index lists, maps, and strings.",
+              );
+            }
+            break;
+
+          case OpCode.indexSet:
+            final value = pop();
+            final index = pop();
+            final target = pop();
+
+            if (target is List) {
+              if (index is! int) {
+                _runtimeError("List index must be an integer.");
+                frame = _frames.last;
+                break;
+              }
+              if (index < 0 || index >= target.length) {
+                _runtimeError("List index out of bounds.");
+                frame = _frames.last;
+                break;
+              }
+              target[index] = value;
+            } else if (target is Map) {
+              if (index is! String) {
+                _runtimeError("Map key must be a string.");
+                frame = _frames.last;
+                break;
+              }
+              target[index] = value;
+            } else {
+              _runtimeError("Can only set index on lists and maps.");
+              frame = _frames.last;
+              break;
+            }
+            push(
+              value,
+            ); // Assignment expression evaluates to the assigned value
+            break;
+
+          case OpCode.classOp:
+            final nameIndex = frame.chunk.code[frame.ip++];
+            final name = frame.chunk.constants[nameIndex] as String;
+            push(ObjClass(name));
+            break;
+
+          case OpCode.inherit:
+            final superclass = peek(0);
+            if (superclass is! ObjClass) {
+              _runtimeError("Superclass must be a class.");
+              frame = _frames.last;
+              break;
+            }
+            final subclass = peek(1) as ObjClass;
+            subclass.superclass = superclass;
+            subclass.methods.addAll(superclass.methods);
+            // Don't pop superclass - it stays on stack as the "super" local value
+            break;
+
+          case OpCode.method:
+            final nameIndex = frame.chunk.code[frame.ip++];
+            final name = frame.chunk.constants[nameIndex] as String;
+            final method = peek(0) as ObjClosure;
+            // Find the class - it might be at peek(1) or peek(2) depending on whether
+            // there's a superclass on the stack.
+            // If we have [subclass, superclass, method], peek(1) is superclass and peek(2) is subclass.
+            // We want to define the method on the subclass.
+            ObjClass? klass;
+            final p1 = peek(1);
+            final p2 = _sp > 2 ? peek(2) : null;
+
+            if (p2 is ObjClass && p1 is ObjClass && p2.superclass == p1) {
+              klass = p2;
+            } else if (p1 is ObjClass) {
+              klass = p1;
+            }
+
+            if (klass == null) {
+              _runtimeError("Could not find class for method definition.");
+              frame = _frames.last;
+              break;
+            }
+            klass.methods[name] = method;
+            pop(); // Pop method
+            break;
+
+          case OpCode.getProperty:
+            final nameIndex = frame.chunk.code[frame.ip++];
+            final name = frame.chunk.constants[nameIndex] as String;
+            final receiver = peek(0);
+
+            if (receiver is ObjInstance) {
+              if (name == "fields") {
+                pop();
+                push(receiver.fields);
+                break;
+              }
+
+              if (receiver.fields.containsKey(name)) {
+                pop();
+                push(receiver.fields[name]);
+                break;
+              }
+
+              final method = receiver.klass.methods[name];
+              if (method != null) {
+                pop();
+                push(ObjBoundMethod(receiver, method));
+                break;
+              }
+
+              _runtimeError("Undefined property '$name'.");
+              frame = _frames.last;
+              break;
+            }
+
+            final nativeMethod = _getNativeMethod(receiver, name);
+            if (nativeMethod != null) {
+              pop();
+              push(nativeMethod);
+              break;
+            }
+
+            _runtimeError(
+              "Only instances have properties. $receiver (${receiver.runtimeType})",
             );
-          }
-          break;
+            frame = _frames.last;
+            break;
 
-        case OpCode.bitNot:
-          final a = pop();
-          if (a is int) {
-            push(~a);
-          } else {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Operand must be an integer.",
+          case OpCode.setProperty:
+            final nameIndex = frame.chunk.code[frame.ip++];
+            final name = frame.chunk.constants[nameIndex] as String;
+            final value = pop();
+            final receiver = peek(0);
+
+            if (receiver is ObjInstance) {
+              if (name == "fields") {
+                _runtimeError("Cannot assign to reserved property 'fields'.");
+                frame = _frames.last;
+                break;
+              }
+              receiver.fields[name] = value;
+              pop();
+              push(value);
+              break;
+            }
+
+            _runtimeError(
+              "Only instances have fields. Got ${receiver.runtimeType} instead.",
             );
-          }
-          break;
+            frame = _frames.last;
+            break;
 
-        case OpCode.shiftLeft:
-          final b = pop();
-          final a = pop();
-          if (a is int && b is int) {
-            push(a << b);
-          } else {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Operands must be integers.",
-            );
-          }
-          break;
+          case OpCode.getSuper:
+            final nameIndex = frame.chunk.code[frame.ip++];
+            final name = frame.chunk.constants[nameIndex] as String;
+            final superValue = pop();
+            if (superValue is! ObjClass) {
+              _runtimeError(
+                "GET_SUPER expected ObjClass but got ${superValue.runtimeType}. Looking for method '$name'.",
+              );
+              frame = _frames.last;
+              break;
+            }
+            final superclass = superValue;
+            final receiverValue = peek(0);
+            if (receiverValue is! ObjInstance) {
+              _runtimeError(
+                "GET_SUPER expected ObjInstance receiver but got ${receiverValue.runtimeType}.",
+              );
+              frame = _frames.last;
+              break;
+            }
+            final receiver = receiverValue;
 
-        case OpCode.shiftRight:
-          final b = pop();
-          final a = pop();
-          if (a is int && b is int) {
-            push(a >> b);
-          } else {
-            throw reportRuntimeError(
-              getCurrentLine(),
-              "Operands must be integers.",
-            );
-          }
-          break;
+            final method = superclass.methods[name];
+            if (method == null) {
+              _runtimeError("Undefined property '$name'.");
+              frame = _frames.last;
+              break;
+            }
 
-        // default:
-        //   throw RuntimeError.withLine(_getCurrentLine(), "Unknown opcode $instruction");
+            pop();
+            push(ObjBoundMethod(receiver, method));
+            break;
+
+          case OpCode.awaitOp:
+            final future = peek(0);
+            if (future is Future) {
+              final result = await future;
+              pop();
+              push(result);
+            }
+            break;
+
+          case OpCode.isOp:
+            final type = pop();
+            final value = pop();
+            if (type is String) {
+              if (type == "num") {
+                push(value is num);
+              } else if (type == "bool") {
+                push(value is bool);
+              } else if (type == "string") {
+                push(value is String);
+              } else if (type == "list") {
+                push(value is List);
+              } else if (type == "map") {
+                push(value is Map);
+              } else if (type == "date") {
+                push(value is DateTime);
+              } else if (type == "duration") {
+                push(value is Duration);
+              } else {
+                push(false);
+              }
+            } else if (type is ObjClass) {
+              if (value is ObjInstance) {
+                ObjClass? k = value.klass;
+                bool found = false;
+                while (k != null) {
+                  if (k == type) {
+                    found = true;
+                    break;
+                  }
+                  k = k.superclass;
+                }
+                push(found);
+              } else {
+                push(false);
+              }
+            } else {
+              _runtimeError("Invalid type operand for 'is'.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.bitAnd:
+            final b = pop();
+            final a = pop();
+            if (a is int && b is int) {
+              push(a & b);
+            } else {
+              _runtimeError("Operands must be integers.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.bitOr:
+            final b = pop();
+            final a = pop();
+            if (a is int && b is int) {
+              push(a | b);
+            } else {
+              _runtimeError("Operands must be integers.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.bitXor:
+            final b = pop();
+            final a = pop();
+            if (a is int && b is int) {
+              push(a ^ b);
+            } else {
+              _runtimeError("Operands must be integers.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.bitNot:
+            final a = pop();
+            if (a is int) {
+              push(~a);
+            } else {
+              _runtimeError("Operand must be an integer.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.shiftLeft:
+            final b = pop();
+            final a = pop();
+            if (a is int && b is int) {
+              push(a << b);
+            } else {
+              _runtimeError("Operands must be integers.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          case OpCode.shiftRight:
+            final b = pop();
+            final a = pop();
+            if (a is int && b is int) {
+              push(a >> b);
+            } else {
+              _runtimeError("Operands must be integers.");
+              frame = _frames.last;
+              break;
+            }
+            break;
+
+          // default:
+          //   throw RuntimeError.withLine(_getCurrentLine(), "Unknown opcode $instruction");
+        } // end switch
+      } on _CaughtException {
+        frame = _frames.last;
+        continue;
       }
       _isRunning = false;
     }
@@ -945,8 +1012,7 @@ class VM {
   Future<void> _callValue(Object? callee, int argCount) async {
     if (callee is ObjClosure) {
       if (argCount != callee.function.arity) {
-        throw reportRuntimeError(
-          getCurrentLine(),
+        _runtimeError(
           "Expected ${callee.function.arity} arguments but got $argCount.",
         );
       }
@@ -964,10 +1030,7 @@ class VM {
       return;
     } else if (callee is Callable) {
       if (argCount != callee.arity) {
-        throw reportRuntimeError(
-          getCurrentLine(),
-          "Expected ${callee.arity} arguments but got $argCount.",
-        );
+        _runtimeError("Expected ${callee.arity} arguments but got $argCount.");
       }
       final args = <dynamic>[];
       for (int i = 0; i < argCount; i++) {
@@ -988,10 +1051,7 @@ class VM {
         _frames.add(CallFrame(initializer, _sp - argCount - 1));
         return;
       } else if (argCount != 0) {
-        throw reportRuntimeError(
-          getCurrentLine(),
-          "Expected 0 arguments but got $argCount.",
-        );
+        _runtimeError("Expected 0 arguments but got $argCount.");
       }
 
       // No init method, instance is already on stack, just return
@@ -1006,10 +1066,7 @@ class VM {
       return;
     }
 
-    throw reportRuntimeError(
-      getCurrentLine(),
-      "Can only call functions and classes.",
-    );
+    _runtimeError("Can only call functions and classes.");
   }
 
   ObjUpvalue _captureUpvalue(int local) {
@@ -1139,8 +1196,7 @@ class VM {
   ) async {
     // Validate arity
     if (arguments.length != closure.function.arity) {
-      throw reportRuntimeError(
-        getCurrentLine(),
+      _runtimeError(
         "Expected ${closure.function.arity} arguments but got ${arguments.length}.",
       );
     }
@@ -1186,10 +1242,7 @@ class VM {
         return;
       }
 
-      throw RuntimeError.withLine(
-        getCurrentLine(),
-        "Undefined property '$name'.",
-      );
+      _runtimeError("Undefined property '$name'.");
     }
 
     final nativeMethod = _getNativeMethod(receiver, name);
@@ -1199,8 +1252,7 @@ class VM {
       return;
     }
 
-    throw RuntimeError.withLine(
-      getCurrentLine(),
+    _runtimeError(
       "Only instances have methods. Name: $name, Receiver: $receiver",
     );
   }
@@ -1212,10 +1264,7 @@ class VM {
   ) async {
     final method = superclass.methods[name];
     if (method == null) {
-      throw RuntimeError.withLine(
-        getCurrentLine(),
-        "Undefined property '$name'.",
-      );
+      _runtimeError("Undefined property '$name'.");
     }
 
     // Receiver is at peek(argCount)
@@ -1225,3 +1274,5 @@ class VM {
     await _callValue(method, argCount);
   }
 }
+
+class _CaughtException implements Exception {}
