@@ -19,7 +19,9 @@ void main() {
       ''';
 
       final vm = VM();
-      final state = await vm.interpret(BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()));
+      final state = await vm.interpret(
+        BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()),
+      );
 
       expect(state['return_code'], 0);
       expect(state['result'], "oops");
@@ -44,7 +46,9 @@ void main() {
       ''';
 
       final vm = VM();
-      final state = await vm.interpret(BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()));
+      final state = await vm.interpret(
+        BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()),
+      );
 
       expect(state['return_code'], 0);
       expect(state['inner'], "inner error");
@@ -71,7 +75,9 @@ void main() {
       ''';
 
       final vm = VM();
-      final state = await vm.interpret(BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()));
+      final state = await vm.interpret(
+        BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()),
+      );
 
       expect(state['return_code'], 0);
       expect(state['result'], "boom");
@@ -91,7 +97,9 @@ void main() {
       ''';
 
       final vm = VM();
-      final state = await vm.interpret(BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()));
+      final state = await vm.interpret(
+        BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()),
+      );
 
       expect(state['return_code'], 0);
       expect(state['result'], "outer");
@@ -103,7 +111,9 @@ void main() {
         ''';
 
       final vm = VM();
-      final state = await vm.interpret(BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()));
+      final state = await vm.interpret(
+        BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()),
+      );
 
       expect(state['return_code'], 1);
       expect(state['error'], contains("Unhandled exception: crash"));
@@ -124,7 +134,9 @@ void main() {
       ''';
 
       final vm = VM();
-      final state = await vm.interpret(BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()));
+      final state = await vm.interpret(
+        BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()),
+      );
 
       expect(state['return_code'], 0);
       expect(state['result'], "0C2");
@@ -146,7 +158,9 @@ void main() {
       ''';
 
       final vm = VM();
-      final state = await vm.interpret(BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()));
+      final state = await vm.interpret(
+        BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()),
+      );
 
       expect(state['return_code'], 0);
       expect(state['result'], "0B");
@@ -170,7 +184,9 @@ void main() {
        ''';
 
       final vm = VM();
-      final state = await vm.interpret(BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()));
+      final state = await vm.interpret(
+        BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()),
+      );
 
       expect(state['return_code'], 0);
       expect(state['result'], "caught");
@@ -194,7 +210,9 @@ void main() {
        ''';
 
       final vm = VM();
-      final state = await vm.interpret(BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()));
+      final state = await vm.interpret(
+        BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()),
+      );
 
       expect(state['return_code'], 0);
       expect(state['result'], "escaped");
@@ -209,7 +227,9 @@ void main() {
        ''';
 
       final vm = VM();
-      final state = await vm.interpret(BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()));
+      final state = await vm.interpret(
+        BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()),
+      );
 
       expect(state['return_code'], 0);
       expect(state['caught'], 123);
@@ -226,7 +246,9 @@ void main() {
        ''';
 
       final vm = VM();
-      final state = await vm.interpret(BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()));
+      final state = await vm.interpret(
+        BytecodeCompiler().compile(Parser(Lexer(script).scan()).parse()),
+      );
 
       expect(state['return_code'], 0);
       expect(state['caught'], "Error: 404 - Not Found");

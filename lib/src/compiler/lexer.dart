@@ -251,7 +251,9 @@ class Lexer {
     const cuaZ = 90;
     const cua_ = 95;
 
-    return ((cua >= cuaa && cua <= cuaz) || (cua >= cuaA && cua <= cuaZ) || (allowUnderscore && cua == cua_));
+    return ((cua >= cuaa && cua <= cuaz) ||
+        (cua >= cuaA && cua <= cuaZ) ||
+        (allowUnderscore && cua == cua_));
   }
 
   bool _isAlphaNumeric(String c, {bool allowAlphaUnderscore = true}) {
@@ -265,7 +267,10 @@ class Lexer {
 
     String value = _source.substring(_start, _current);
 
-    _addToken(TokenType.NUMBER, literal: int.parse(value.replaceFirst("0x", ""), radix: 16));
+    _addToken(
+      TokenType.NUMBER,
+      literal: int.parse(value.replaceFirst("0x", ""), radix: 16),
+    );
   }
 
   void _number() {
@@ -288,7 +293,10 @@ class Lexer {
       }
     }
 
-    _addToken(TokenType.NUMBER, literal: num.parse(_source.substring(_start, _current)));
+    _addToken(
+      TokenType.NUMBER,
+      literal: num.parse(_source.substring(_start, _current)),
+    );
   }
 
   bool _isDigit(String c) {
@@ -311,7 +319,11 @@ class Lexer {
     if (!_keywords.containsKey(text)) {
       _addToken(TokenType.IDENTIFIER, literal: text);
       if (text.length > 64) {
-        _reportError(line: _line, token: _tokens.last, message: "Identifier exceeds max length of 64.");
+        _reportError(
+          line: _line,
+          token: _tokens.last,
+          message: "Identifier exceeds max length of 64.",
+        );
       }
     } else {
       //keywords
@@ -349,7 +361,8 @@ class Lexer {
         _addToken(TokenType.LEFT_BRACE);
         break;
       case '}':
-        if (_interpolationStack.isNotEmpty && _braceDepth == _interpolationStack.last) {
+        if (_interpolationStack.isNotEmpty &&
+            _braceDepth == _interpolationStack.last) {
           _interpolationStack.removeLast();
           _braceDepth--;
 
@@ -467,6 +480,9 @@ class Lexer {
   }
 
   void _reportError({int line = 1, Token? token, String message = ""}) {
-    _addToken(TokenType.ERROR, literal: "[line: $line] Error at token $token. $message.");
+    _addToken(
+      TokenType.ERROR,
+      literal: "[line: $line] Error at token $token. $message.",
+    );
   }
 }

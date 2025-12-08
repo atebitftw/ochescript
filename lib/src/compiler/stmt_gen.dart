@@ -29,7 +29,12 @@ abstract class StmtVisitor<R> {
 }
 
 class Try extends Stmt {
-  Try(this.tryBlock, this.catchBlock, this.catchVariable, {required super.token});
+  Try(
+    this.tryBlock,
+    this.catchBlock,
+    this.catchVariable, {
+    required super.token,
+  });
 
   final Stmt tryBlock;
   final Stmt catchBlock;
@@ -176,7 +181,13 @@ class While extends Stmt {
 }
 
 class ScriptFunction extends Stmt {
-  ScriptFunction(this.name, this.params, this.body, this.isAsync, {required super.token});
+  ScriptFunction(
+    this.name,
+    this.params,
+    this.body,
+    this.isAsync, {
+    required super.token,
+  });
 
   final Token name;
   final List<Token> params;
@@ -247,7 +258,13 @@ class Continue extends Stmt {
 }
 
 class For extends Stmt {
-  For(this.initializer, this.condition, this.increment, this.body, {required super.token});
+  For(
+    this.initializer,
+    this.condition,
+    this.increment,
+    this.body, {
+    required super.token,
+  });
 
   final Stmt? initializer;
   final Expr? condition;
