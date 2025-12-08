@@ -71,7 +71,7 @@ Most scripts will rarely come close to this limit (most will never exceed 100). 
 
 ## Roadmap Ideas
 *   Adding try/catch exception handling will probably be my next effort.
-*   Native method binding to user-defined class instances sounds intriguing.  Though at that point, I may as well just implement native extension method support withing the language.
+*   Native method binding to user-defined class instances sounds intriguing.  Though at that point, I may as well just implement native extension method support within the language itself.
 *   Perhaps implement support for a Record type, and destructuring syntax.  It would be nice to pass anonymous records back and forth between Dart and OcheScript.
 *   More robust support for Futures and async/await.  OcheScript currently doesn't have it's own microtask queue, so it can't run async code in the same way that Dart can.  It does have the capability to await futures, but it doesn't have it's own event loop.
 *   I would like eventually to implement a LINQ-style query syntax for OcheScript, to make it more useful for data processing and manipulation.  Perhaps with some kind of provider interface to Dart-side data services like Firebase, REDIS, etc.
