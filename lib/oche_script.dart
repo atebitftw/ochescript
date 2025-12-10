@@ -142,7 +142,7 @@ Future<Map<String, Object>> _run(
 
     vm.setOutState(name, value);
     outCallback?.call(name, value);
-    return null;
+    return args[1];
   });
 
   vm.defineNative("dart", (args) {
