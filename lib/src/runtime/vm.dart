@@ -37,7 +37,6 @@ class VM {
   final Map<String, Object> _outState = {};
 
   // Callbacks
-  Function(String, dynamic)? _outCallback;
   SourceMapper? sourceMapper;
 
   /// Set a value in the output state.
@@ -48,43 +47,28 @@ class VM {
   /// Register a callback for output.  Only one callback can be registered at a time.
   void registerOutCallback(Function(String, dynamic) callback) {
     if (_isRunning) {
-      throw reportRuntimeError(
-        getCurrentLine(),
-        "Cannot register output callback while VM is running.",
-      );
+      throw reportRuntimeError(getCurrentLine(), "Cannot register output callback while VM is running.");
     }
-    _outCallback = callback;
   }
 
   /// Defines a native function in the global scope.
   void defineNative(String name, Function function) {
     if (_isRunning) {
-      throw reportRuntimeError(
-        getCurrentLine(),
-        "Cannot define native function while VM is running.",
-      );
+      throw reportRuntimeError(getCurrentLine(), "Cannot define native function while VM is running.");
     }
     if (_globals.containsKey(name)) {
-      Common.log.info(
-        "${getCurrentLine()}: Native function '$name' already defined.",
-      );
+      Common.log.info("${getCurrentLine()}: Native function '$name' already defined.");
     }
     _globals[name] = ObjNative(name, function);
   }
 
   void defineGlobal(String name, Object? value, {bool override = false}) {
     if (_isRunning) {
-      throw reportRuntimeError(
-        getCurrentLine(),
-        "Cannot define global variable while VM is running.",
-      );
+      throw reportRuntimeError(getCurrentLine(), "Cannot define global variable while VM is running.");
     }
 
     if (!override && _globals.containsKey(name)) {
-      throw reportRuntimeError(
-        getCurrentLine(),
-        "Global variable '$name' already defined.",
-      );
+      throw reportRuntimeError(getCurrentLine(), "Global variable '$name' already defined.");
     }
     _globals[name] = value;
   }
@@ -169,10 +153,7 @@ class VM {
     _isRunning = false;
     halt = true;
     returnCode = 1;
-    _outState["error"] = reportRuntimeError(
-      currentLine,
-      "Unhandled exception: $exception",
-    ).toString();
+    _outState["error"] = reportRuntimeError(currentLine, "Unhandled exception: $exception").toString();
     _outState["return_code"] = 1;
 
     throw _VMHaltException();
@@ -257,9 +238,7 @@ class VM {
             break;
 
           case OpCode.tryOp:
-            final offset =
-                (frame.chunk.code[frame.ip] << 8) |
-                frame.chunk.code[frame.ip + 1];
+            final offset = (frame.chunk.code[frame.ip] << 8) | frame.chunk.code[frame.ip + 1];
             frame.ip += 2;
             final catchIp = frame.ip + offset;
             frame.handlers.add(ExceptionHandler(catchIp, _sp));
@@ -307,10 +286,7 @@ class VM {
             _isRunning = false;
             halt = true;
             returnCode = 1;
-            _outState["error"] = reportRuntimeError(
-              currentLine,
-              "Unhandled exception: $exception",
-            ).toString();
+            _outState["error"] = reportRuntimeError(currentLine, "Unhandled exception: $exception").toString();
             _outState["return_code"] = 1;
             break;
 
@@ -419,9 +395,7 @@ class VM {
               a.addAll(b);
               push(a);
             } else {
-              _runtimeError(
-                "ADD: Invalid operands: (${a.runtimeType}, ${b.runtimeType})",
-              );
+              _runtimeError("ADD: Invalid operands: (${a.runtimeType}, ${b.runtimeType})");
               frame = _frames.last;
               break;
             }
@@ -439,9 +413,7 @@ class VM {
             } else if (a is Duration && b is Duration) {
               push(a - b);
             } else {
-              _runtimeError(
-                "SUBTRACT: Invalid operands: (${a.runtimeType}, ${b.runtimeType})",
-              );
+              _runtimeError("SUBTRACT: Invalid operands: (${a.runtimeType}, ${b.runtimeType})");
               frame = _frames.last;
               break;
             }
@@ -517,17 +489,13 @@ class VM {
           //   break;
 
           case OpCode.jumpOp:
-            final offset =
-                (frame.chunk.code[frame.ip] << 8) |
-                frame.chunk.code[frame.ip + 1];
+            final offset = (frame.chunk.code[frame.ip] << 8) | frame.chunk.code[frame.ip + 1];
             frame.ip += 2;
             frame.ip += offset;
             break;
 
           case OpCode.jumpIfFalse:
-            final offset =
-                (frame.chunk.code[frame.ip] << 8) |
-                frame.chunk.code[frame.ip + 1];
+            final offset = (frame.chunk.code[frame.ip] << 8) | frame.chunk.code[frame.ip + 1];
             frame.ip += 2;
             if (_isFalsey(peek(0))) {
               frame.ip += offset;
@@ -535,9 +503,7 @@ class VM {
             break;
 
           case OpCode.loop:
-            final offset =
-                (frame.chunk.code[frame.ip] << 8) |
-                frame.chunk.code[frame.ip + 1];
+            final offset = (frame.chunk.code[frame.ip] << 8) | frame.chunk.code[frame.ip + 1];
             frame.ip += 2;
             frame.ip -= offset;
             break;
@@ -550,8 +516,7 @@ class VM {
             break;
 
           case OpCode.invoke:
-            final method =
-                frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
+            final method = frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
             final argCount = frame.chunk.code[frame.ip++];
             await _invoke(method, argCount);
             if (halt) break;
@@ -559,8 +524,7 @@ class VM {
             break;
 
           case OpCode.superInvoke:
-            final method =
-                frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
+            final method = frame.chunk.constants[frame.chunk.code[frame.ip++]] as String;
             final argCount = frame.chunk.code[frame.ip++];
             final superclass = pop() as ObjClass;
             await _invokeSuper(method, argCount, superclass);
@@ -585,8 +549,7 @@ class VM {
 
           case OpCode.closure:
             final constantIndex = frame.chunk.code[frame.ip++];
-            final function =
-                frame.chunk.constants[constantIndex] as ObjFunction;
+            final function = frame.chunk.constants[constantIndex] as ObjFunction;
 
             final upvalues = <ObjUpvalue>[];
             for (int i = 0; i < function.upvalues.length; i++) {
@@ -659,10 +622,7 @@ class VM {
 
             if (target is List) {
               if (index is! int) {
-                throw reportRuntimeError(
-                  getCurrentLine(),
-                  "List index must be an integer.",
-                );
+                throw reportRuntimeError(getCurrentLine(), "List index must be an integer.");
               }
               if (index < 0 || index >= target.length) {
                 _runtimeError("List index out of bounds.");
@@ -672,37 +632,22 @@ class VM {
               push(target[index]);
             } else if (target is Map) {
               if (index is! String) {
-                throw reportRuntimeError(
-                  getCurrentLine(),
-                  "Map key must be a string.",
-                );
+                throw reportRuntimeError(getCurrentLine(), "Map key must be a string.");
               }
               if (!target.containsKey(index)) {
-                throw reportRuntimeError(
-                  getCurrentLine(),
-                  "Map key '$index' not found.",
-                );
+                throw reportRuntimeError(getCurrentLine(), "Map key '$index' not found.");
               }
               push(target[index]);
             } else if (target is String) {
               if (index is! int) {
-                throw reportRuntimeError(
-                  getCurrentLine(),
-                  "String index must be an integer.",
-                );
+                throw reportRuntimeError(getCurrentLine(), "String index must be an integer.");
               }
               if (index < 0 || index >= target.length) {
-                throw reportRuntimeError(
-                  getCurrentLine(),
-                  "String index out of bounds.",
-                );
+                throw reportRuntimeError(getCurrentLine(), "String index out of bounds.");
               }
               push(target[index]);
             } else {
-              throw reportRuntimeError(
-                getCurrentLine(),
-                "Can only index lists, maps, and strings.",
-              );
+              throw reportRuntimeError(getCurrentLine(), "Can only index lists, maps, and strings.");
             }
             break;
 
@@ -735,9 +680,7 @@ class VM {
               frame = _frames.last;
               break;
             }
-            push(
-              value,
-            ); // Assignment expression evaluates to the assigned value
+            push(value); // Assignment expression evaluates to the assigned value
             break;
 
           case OpCode.classOp:
@@ -823,9 +766,7 @@ class VM {
               break;
             }
 
-            _runtimeError(
-              "Only instances have properties. $receiver (${receiver.runtimeType})",
-            );
+            _runtimeError("Only instances have properties. $receiver (${receiver.runtimeType})");
             frame = _frames.last;
             break;
 
@@ -847,9 +788,7 @@ class VM {
               break;
             }
 
-            _runtimeError(
-              "Only instances have fields. Got ${receiver.runtimeType} instead.",
-            );
+            _runtimeError("Only instances have fields. Got ${receiver.runtimeType} instead.");
             frame = _frames.last;
             break;
 
@@ -867,9 +806,7 @@ class VM {
             final superclass = superValue;
             final receiverValue = peek(0);
             if (receiverValue is! ObjInstance) {
-              _runtimeError(
-                "GET_SUPER expected ObjInstance receiver but got ${receiverValue.runtimeType}.",
-              );
+              _runtimeError("GET_SUPER expected ObjInstance receiver but got ${receiverValue.runtimeType}.");
               frame = _frames.last;
               break;
             }
@@ -1038,9 +975,7 @@ class VM {
   Future<void> _callValue(Object? callee, int argCount) async {
     if (callee is ObjClosure) {
       if (argCount != callee.function.arity) {
-        _runtimeError(
-          "Expected ${callee.function.arity} arguments but got $argCount.",
-        );
+        _runtimeError("Expected ${callee.function.arity} arguments but got $argCount.");
       }
       _frames.add(CallFrame(callee, _sp - argCount - 1));
       return;
@@ -1158,52 +1093,36 @@ class VM {
 
   NativeMethod? _getNativeMethod(Object? receiver, String name) {
     if (receiver is String) {
-      if (NativeMethod.getNativeMethodsForType(
-        NativeMethodTarget.string,
-      ).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.string).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is List) {
-      if (NativeMethod.getNativeMethodsForType(
-        NativeMethodTarget.list,
-      ).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.list).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is Map) {
-      if (NativeMethod.getNativeMethodsForType(
-        NativeMethodTarget.map,
-      ).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.map).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is num) {
-      if (NativeMethod.getNativeMethodsForType(
-        NativeMethodTarget.number,
-      ).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.number).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is bool) {
-      if (NativeMethod.getNativeMethodsForType(
-        NativeMethodTarget.boolean,
-      ).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.boolean).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is DateTime) {
-      if (NativeMethod.getNativeMethodsForType(
-        NativeMethodTarget.date,
-      ).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.date).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is Duration) {
-      if (NativeMethod.getNativeMethodsForType(
-        NativeMethodTarget.duration,
-      ).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.duration).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     } else if (receiver is Future) {
       print("got it");
-      if (NativeMethod.getNativeMethodsForType(
-        NativeMethodTarget.future,
-      ).containsKey(name)) {
+      if (NativeMethod.getNativeMethodsForType(NativeMethodTarget.future).containsKey(name)) {
         return NativeMethod(receiver, name);
       }
     }
@@ -1216,15 +1135,10 @@ class VM {
   ///
   /// Unlike a normal CALL opcode, this runs the closure to completion and
   /// returns the result synchronously (within the async context).
-  Future<Object?> callClosure(
-    ObjClosure closure,
-    List<dynamic> arguments,
-  ) async {
+  Future<Object?> callClosure(ObjClosure closure, List<dynamic> arguments) async {
     // Validate arity
     if (arguments.length != closure.function.arity) {
-      _runtimeError(
-        "Expected ${closure.function.arity} arguments but got ${arguments.length}.",
-      );
+      _runtimeError("Expected ${closure.function.arity} arguments but got ${arguments.length}.");
     }
 
     // Remember the current frame count so we know when the closure returns
@@ -1281,16 +1195,10 @@ class VM {
       return;
     }
 
-    _runtimeError(
-      "Only instances have methods. Name: $name, Receiver: $receiver",
-    );
+    _runtimeError("Only instances have methods. Name: $name, Receiver: $receiver");
   }
 
-  Future<void> _invokeSuper(
-    String name,
-    int argCount,
-    ObjClass superclass,
-  ) async {
+  Future<void> _invokeSuper(String name, int argCount, ObjClass superclass) async {
     final method = superclass.methods[name];
     if (method == null) {
       _runtimeError("Undefined property '$name'.");
