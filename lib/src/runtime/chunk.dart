@@ -70,7 +70,7 @@ class Chunk {
       case OpCode.getSuper:
       case OpCode.method:
       case OpCode.classOp:
-      case OpCode.outOp:
+        // case OpCode.outOp:
         return _constantInstruction(buffer, op.name, offset);
       case OpCode.getLocal:
       case OpCode.setLocal:

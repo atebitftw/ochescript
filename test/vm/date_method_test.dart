@@ -29,6 +29,28 @@ void main() {
       compiler = BytecodeCompiler();
       vm = VM();
       defineVmNativeFunctions(vm);
+      vm.defineNative("out", (args) {
+        if (args.length != 2) {
+          throw vm.reportRuntimeError(
+            vm.getCurrentLine(),
+            "out() requires name and value.",
+          );
+        }
+
+        if (args[0] is! String) {
+          throw vm.reportRuntimeError(
+            vm.getCurrentLine(),
+            "out() requires name to resolve to a string: ${args[0]}",
+          );
+        }
+
+        final name = args[0] as String;
+        final value = args[1];
+
+        vm.setOutState(name, value);
+        //outCallback!(name, value);
+        return null;
+      });
     });
 
     Future<Map<String, Object>> run(String source) async {

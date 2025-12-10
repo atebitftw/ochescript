@@ -30,7 +30,7 @@ void main(List<String> args) {
   ]);
 
   defineAst(outputDir, "Stmt", <String>[
-    "Out : String identifier, Expr value",
+    "ForIn : Token loopVariable, Expr iterable, Stmt body",
     "Print : Expr expression",
     "Const : Expr initializer",
     "Expression : Expr expression",
@@ -46,6 +46,8 @@ void main(List<String> args) {
     "For : Stmt? initializer, Expr? condition, Expr? increment, Stmt body",
     "SwitchCase : Expr? value, List<Stmt> statements",
     "Switch : Expr expression, List<SwitchCase> cases",
+    "Throw : Expr value",
+    "Try : Stmt tryBlock, Stmt catchBlock, Token catchVariable",
   ]);
 }
 
@@ -53,6 +55,7 @@ void defineAst(String outputDir, String baseName, List<String> types) async {
   final buffer = StringBuffer();
   String path =
       "${outputDir.toLowerCase()}${Platform.pathSeparator}${baseName.toLowerCase()}_gen.dart";
+  print("Generating $path");
 
   buffer.writeln("// ignore_for_file: unused_import");
   buffer.writeln("import 'package:oche_script/src/compiler/expr.dart';");
@@ -78,9 +81,7 @@ void defineAst(String outputDir, String baseName, List<String> types) async {
 
   try {
     final writer = File(path);
-    final handle = writer.openWrite();
     writer.writeAsStringSync(buffer.toString());
-    await handle.close();
   } on FileSystemException catch (e) {
     stdout.writeln("File IO error occured: $e");
   }

@@ -40,6 +40,11 @@ class VM {
   Function(String, dynamic)? _outCallback;
   SourceMapper? sourceMapper;
 
+  /// Set a value in the output state.
+  void setOutState(String key, dynamic value) {
+    _outState[key] = value;
+  }
+
   /// Register a callback for output.  Only one callback can be registered at a time.
   void registerOutCallback(Function(String, dynamic) callback) {
     if (_isRunning) {
@@ -497,19 +502,19 @@ class VM {
             print(pop());
             break;
 
-          case OpCode.outOp:
-            final nameIndex = frame.chunk.code[frame.ip++];
-            final name = frame.chunk.constants[nameIndex] as String;
-            final value = pop();
+          // case OpCode.outOp:
+          //   final nameIndex = frame.chunk.code[frame.ip++];
+          //   final name = frame.chunk.constants[nameIndex] as String;
+          //   final value = pop();
 
-            if (value != null) {
-              _outState[name] = value;
-            }
+          //   if (value != null) {
+          //     _outState[name] = value;
+          //   }
 
-            if (_outCallback != null) {
-              _outCallback!(name, value);
-            }
-            break;
+          //   if (_outCallback != null) {
+          //     _outCallback!(name, value);
+          //   }
+          //   break;
 
           case OpCode.jumpOp:
             final offset =

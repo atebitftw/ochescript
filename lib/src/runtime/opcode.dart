@@ -113,9 +113,9 @@ enum OpCode {
   /// Print the top value of the stack.
   printOp,
 
-  /// Output the top value of the stack to the external environment.
-  /// Operand: 1 byte index into the constant pool (output name).
-  outOp,
+  // /// Output the top value of the stack to the external environment.
+  // /// Operand: 1 byte index into the constant pool (output name).
+  // outOp,
 
   /// Jump unconditionally.
   /// Operand: 2 byte offset.

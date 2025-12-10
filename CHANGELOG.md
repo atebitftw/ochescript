@@ -43,3 +43,6 @@ Public release.
   "return_code": 1
 }
 ```
+
+# 1.1.4
+- Moved out() into a native function.

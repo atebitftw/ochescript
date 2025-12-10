@@ -17,7 +17,7 @@ class Lexer {
     "continue": TokenType.CONTINUE,
     "break": TokenType.BREAK,
     "print": TokenType.PRINT,
-    "out": TokenType.OUT,
+    // "out": TokenType.OUT,
     // "dart": TokenType.DART,
     "class": TokenType.CLASS,
     "this": TokenType.THIS,

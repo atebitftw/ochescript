@@ -7,7 +7,7 @@ import 'package:oche_script/src/compiler/expr_gen.dart';
 // *** GENERATED CODE.  DO NOT MODIFY ***
 
 abstract class StmtVisitor<R> {
-  R visitOutStmt(Out stmt);
+  R visitForInStmt(ForIn stmt);
   R visitPrintStmt(Print stmt);
   R visitConstStmt(Const stmt);
   R visitExpressionStmt(Expression stmt);
@@ -23,59 +23,24 @@ abstract class StmtVisitor<R> {
   R visitForStmt(For stmt);
   R visitSwitchCaseStmt(SwitchCase stmt);
   R visitSwitchStmt(Switch stmt);
-  R visitForInStmt(ForIn stmt);
-  R visitTryStmt(Try stmt);
   R visitThrowStmt(Throw stmt);
+  R visitTryStmt(Try stmt);
 }
 
-class Try extends Stmt {
-  Try(
-    this.tryBlock,
-    this.catchBlock,
-    this.catchVariable, {
-    required super.token,
-  });
+class ForIn extends Stmt {
+  ForIn(this.loopVariable, this.iterable, this.body, {required super.token});
 
-  final Stmt tryBlock;
-  final Stmt catchBlock;
-  final Token catchVariable;
+  final Token loopVariable;
+  final Expr iterable;
+  final Stmt body;
 
   @override
   R accept<R>(StmtVisitor<R> visitor) {
-    return visitor.visitTryStmt(this);
+    return visitor.visitForInStmt(this);
   }
 
   @override
-  String toString() => "Try";
-}
-
-class Throw extends Stmt {
-  Throw(this.value, {required super.token});
-
-  final Expr value;
-
-  @override
-  R accept<R>(StmtVisitor<R> visitor) {
-    return visitor.visitThrowStmt(this);
-  }
-
-  @override
-  String toString() => "Throw";
-}
-
-class Out extends Stmt {
-  Out(this.identifier, this.value, {required super.token});
-
-  final String identifier;
-  final Expr value;
-
-  @override
-  R accept<R>(StmtVisitor<R> visitor) {
-    return visitor.visitOutStmt(this);
-  }
-
-  @override
-  String toString() => "Out";
+  String toString() => "ForIn";
 }
 
 class Print extends Stmt {
@@ -310,18 +275,37 @@ class Switch extends Stmt {
   String toString() => "Switch";
 }
 
-class ForIn extends Stmt {
-  ForIn(this.loopVariable, this.iterable, this.body, {required super.token});
+class Throw extends Stmt {
+  Throw(this.value, {required super.token});
 
-  final Token loopVariable;
-  final Expr iterable;
-  final Stmt body;
+  final Expr value;
 
   @override
   R accept<R>(StmtVisitor<R> visitor) {
-    return visitor.visitForInStmt(this);
+    return visitor.visitThrowStmt(this);
   }
 
   @override
-  String toString() => "ForIn";
+  String toString() => "Throw";
+}
+
+class Try extends Stmt {
+  Try(
+    this.tryBlock,
+    this.catchBlock,
+    this.catchVariable, {
+    required super.token,
+  });
+
+  final Stmt tryBlock;
+  final Stmt catchBlock;
+  final Token catchVariable;
+
+  @override
+  R accept<R>(StmtVisitor<R> visitor) {
+    return visitor.visitTryStmt(this);
+  }
+
+  @override
+  String toString() => "Try";
 }

@@ -78,9 +78,6 @@ class Parser {
     if (_match([TokenType.PRINT])) {
       return _printStatement();
     }
-    if (_match([TokenType.OUT])) {
-      return _outStatement();
-    }
     if (_match([TokenType.SWITCH])) {
       return _switchStatement();
     }
@@ -95,16 +92,6 @@ class Parser {
       return Block(_block(), token: _previous());
     }
     return _expressionStatement();
-  }
-
-  Stmt _outStatement() {
-    _consume(TokenType.LEFT_PAREN, "Expect '(' after 'out'.");
-    Token name = _consume(TokenType.STRING, "Expect string name.")!;
-    _consume(TokenType.COMMA, "Expect ',' after string name.");
-    Expr value = _expression();
-    _consume(TokenType.RIGHT_PAREN, "Expect ')' after 'out'.");
-    _consume(TokenType.SEMICOLON, "Expect ';' after 'out'.");
-    return Out(name.lexeme, value, token: name);
   }
 
   Stmt _classDeclaration() {
@@ -735,7 +722,6 @@ class Parser {
         case TokenType.IF:
         case TokenType.WHILE:
         case TokenType.PRINT:
-        case TokenType.OUT:
         case TokenType.SWITCH:
         case TokenType.RETURN:
         case TokenType.BREAK:

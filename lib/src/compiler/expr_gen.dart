@@ -90,8 +90,6 @@ class Variable extends Expr {
   Variable(this.name, {required super.token});
 
   final Token name;
-  Object? cachedValue;
-  int cachedVersion = -1;
 
   @override
   R accept<R>(ExprVisitor<R> visitor) {

@@ -58,7 +58,6 @@ enum TokenType {
   IF,
   OR,
   PRINT,
-  OUT,
   RETURN,
   TRUE,
   VAR,

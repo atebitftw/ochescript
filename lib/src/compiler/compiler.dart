@@ -117,14 +117,6 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
   }
 
   @override
-  void visitOutStmt(Out stmt) {
-    stmt.value.accept(this);
-    final nameIdx = _currentChunk.addConstant(stmt.identifier);
-    emitOp(OpCode.outOp, stmt.token.line);
-    emitByte(nameIdx, stmt.token.line);
-  }
-
-  @override
   void visitVarStmt(Var stmt) {
     stmt.initializer.accept(this);
 
