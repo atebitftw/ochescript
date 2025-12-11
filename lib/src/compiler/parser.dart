@@ -342,7 +342,7 @@ class Parser {
   }
 
   Expr _assignment() {
-    Expr expr = _or();
+    Expr expr = _ternary();
 
     if (_match([TokenType.EQUAL])) {
       Token equals = _previous();
@@ -366,6 +366,23 @@ class Parser {
       _errorAt(equals, "Invalid assignment target.");
     }
     return expr;
+  }
+
+  Expr _ternary() {
+    Expr condition = _or();
+
+    if (_match([TokenType.QUESTION])) {
+      Token questionToken = _previous();
+      Expr thenBranch = _expression(); // Allow full expression for then branch
+      _consume(
+        TokenType.COLON,
+        "Expect ':' after then branch of ternary expression.",
+      );
+      Expr elseBranch = _ternary(); // Right-associative: allow chained ternary
+      return Ternary(condition, thenBranch, elseBranch, token: questionToken);
+    }
+
+    return condition;
   }
 
   Expr _or() {

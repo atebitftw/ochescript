@@ -25,6 +25,7 @@ abstract class ExprVisitor<R> {
   R visitFunctionExprExpr(FunctionExpr expr);
   R visitPostfixExpr(Postfix expr);
   R visitAwaitExpr(Await expr);
+  R visitTernaryExpr(Ternary expr);
 }
 
 class Binary extends Expr {
@@ -318,4 +319,25 @@ class Await extends Expr {
 
   @override
   String toString() => "Await";
+}
+
+class Ternary extends Expr {
+  Ternary(
+    this.condition,
+    this.thenBranch,
+    this.elseBranch, {
+    required super.token,
+  });
+
+  final Expr condition;
+  final Expr thenBranch;
+  final Expr elseBranch;
+
+  @override
+  R accept<R>(ExprVisitor<R> visitor) {
+    return visitor.visitTernaryExpr(this);
+  }
+
+  @override
+  String toString() => "Ternary";
 }

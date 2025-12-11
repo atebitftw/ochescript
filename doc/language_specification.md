@@ -284,6 +284,12 @@ The `-` operator is overloaded for several types:
 - `<<` (Left Shift)
 - `>>` (Right Shift)
 
+### Ternary
+The ternary operator is supported for conditional expressions.
+```js
+var x = condition ? trueValue : falseValue;
+```
+
 ### Type Checking
 The `is` operator checks if an object is of a specific type.
 

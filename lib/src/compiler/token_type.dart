@@ -25,6 +25,7 @@ enum TokenType {
   BITSHIFTLEFT, // <<
   BITSHIFTRIGHT, // >>
   BITNOT, // ~
+  QUESTION, // ? for ternary expressions
   // One or two character tokens.
   BANG,
   BANG_EQUAL,

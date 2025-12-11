@@ -410,6 +410,9 @@ class Lexer {
       case ':':
         _addToken(TokenType.COLON);
         break;
+      case '?':
+        _addToken(TokenType.QUESTION);
+        break;
       case '|':
         if (_match('|')) {
           _addToken(TokenType.OR);

@@ -1039,6 +1039,39 @@ class BytecodeCompiler implements ExprVisitor<void>, StmtVisitor<void> {
   }
 
   @override
+  void visitTernaryExpr(Ternary expr) {
+    // Evaluate condition
+    expr.condition.accept(this);
+
+    // Jump if false to else branch
+    emitOp(OpCode.jumpIfFalse, expr.token.line);
+    emitByte(0xff, expr.token.line);
+    emitByte(0xff, expr.token.line);
+    final elseJump = _currentChunk.code.length - 2;
+
+    // Pop condition (was true)
+    emitOp(OpCode.pop, expr.token.line);
+
+    // Emit then branch
+    expr.thenBranch.accept(this);
+
+    // Jump over else branch
+    final endJump = _emitJump(OpCode.jumpOp, expr.token.line);
+
+    // Patch else jump to here
+    _patchJump(elseJump);
+
+    // Pop condition (was false)
+    emitOp(OpCode.pop, expr.token.line);
+
+    // Emit else branch
+    expr.elseBranch.accept(this);
+
+    // Patch end jump
+    _patchJump(endJump);
+  }
+
+  @override
   void visitMapLiteralExpr(MapLiteral expr) {
     for (int i = 0; i < expr.keys.length; i++) {
       expr.keys[i].accept(this);

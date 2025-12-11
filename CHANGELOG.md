@@ -46,3 +46,6 @@ Public release.
 
 # 1.1.4
 - Moved out() into a native function.
+
+# 1.1.5
+- Added support for ternary operator (`condition ? true : false`).

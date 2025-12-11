@@ -27,6 +27,7 @@ void main(List<String> args) {
     "FunctionExpr : List<Token> params, List<Stmt> body, bool isAsync",
     "Postfix  : Expr left, Token operator",
     "Await    : Expr expression",
+    "Ternary  : Expr condition, Expr thenBranch, Expr elseBranch",
   ]);
 
   defineAst(outputDir, "Stmt", <String>[
@@ -53,8 +54,7 @@ void main(List<String> args) {
 
 void defineAst(String outputDir, String baseName, List<String> types) async {
   final buffer = StringBuffer();
-  String path =
-      "${outputDir.toLowerCase()}${Platform.pathSeparator}${baseName.toLowerCase()}_gen.dart";
+  String path = "${outputDir.toLowerCase()}${Platform.pathSeparator}${baseName.toLowerCase()}_gen.dart";
   print("Generating $path");
 
   buffer.writeln("// ignore_for_file: unused_import");
@@ -92,9 +92,7 @@ void defineVisitor(StringBuffer buffer, String baseName, List<String> types) {
 
   for (final type in types) {
     final typeName = type.split(":")[0].trim();
-    buffer.writeln(
-      "   R visit$typeName$baseName($typeName ${baseName.toLowerCase()});",
-    );
+    buffer.writeln("   R visit$typeName$baseName($typeName ${baseName.toLowerCase()});");
   }
 
   buffer.writeln("}");
@@ -118,21 +116,14 @@ String _fieldListToParams(List<String> fields) {
   return sb.toString();
 }
 
-void defineType(
-  StringBuffer buffer,
-  String baseName,
-  String className,
-  String fieldList,
-) {
+void defineType(StringBuffer buffer, String baseName, String className, String fieldList) {
   buffer.writeln("class $className extends $baseName {");
 
   // Store parameters in fields.
   final fields = fieldList.split(", ");
 
   // Constructor.
-  buffer.writeln(
-    "   $className (${_fieldListToParams(fields)}{required super.token});",
-  );
+  buffer.writeln("   $className (${_fieldListToParams(fields)}{required super.token});");
 
   // Fields.
   buffer.writeln("");

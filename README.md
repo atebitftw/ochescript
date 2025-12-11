@@ -18,6 +18,7 @@
 *   **Object-Oriented Programming Features (classes, methods, properties, etc.).**
 *   **Closures and Lambdas.**
 *   **String Interpolation.**
+*   **Ternary Operator (`condition ? true : false`).**
 *   **Try/Catch Exception Handling.**
 *   **Asynchronous Support (async/await).**
 *   **Lightweight Preprocessor Directive Capabilities.**
@@ -64,7 +65,6 @@ I built OcheScript a while back to meet a need that I have on my larger Flutter 
 *   Map keys must be strings.
 *   Currying is not supported.
 *   No direct support for accessing file systems or assets.  This can be achieved via Dart interop.
-*   No support for ternary operator.
 
 ## Roadmap Ideas
 *   Adding try/catch exception handling will probably be my next effort.
