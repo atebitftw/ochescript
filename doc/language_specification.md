@@ -7,7 +7,6 @@ OcheScript is a dynamically-typed, interpreted scripting language designed for e
 # Table Of Contents
 - [Entry](#entry)
 - [Comments](#comments)
-- [Reserved Keywords](#reserved-keywords)
 - [Supported Types](#supported-types)
   - [Table Of Supported Types](#table-of-supported-types)
   - [Reference Types](#reference-types)
@@ -26,7 +25,50 @@ OcheScript is a dynamically-typed, interpreted scripting language designed for e
 - [Native Functions](#native-functions)
 - [Dart Interop](#dart-interop)
 - [Directives](#directives)
+- [Reserved Keywords](#reserved-keywords)
 - [Runtime Stack Size Limits](#runtime-stack-size-limits)
+
+## Example Script
+```js
+// Recursive fibonacci function
+fun fibonacci(n){
+    if(n <= 1){
+        return n;
+    }
+    return fibonacci(n - 1) + fibonacci(n - 2);
+}
+
+fun isPrime(n){
+    if(n <= 1){
+        return false;
+    }
+    for(var i = 2; i < n; i++){
+        if(n % i == 0){
+            return false;
+        }
+    }
+    return true;
+}
+
+// Entry point
+fun main(){
+    var fibTo = 10;
+    var fib = fibonacci(fibTo);
+
+    // Send to dart callback and the map that the script returns on completion.
+    out("fib", fib);
+}
+
+// Invoke the entry point
+main();
+
+// Outputs:
+// The Fibonacci value of 10 is 55.
+// The return map to Dart is:
+// {fib: 55, return_code: 0}
+```
+
+
 
 ## Entry
 [Back To Table Of Contents](#table-of-contents)
@@ -53,73 +95,6 @@ OcheScript supports single-line comments.
 // This is a comment
 var x = 1; // Comment at end of line
 ```
-
-## Reserved Keywords
-[Back To Table Of Contents](#table-of-contents)
-
-The following words are reserved (case-sensitive):
-*   `class`
-*   `super`
-*   `this`
-*   `extends`
-*   `var`
-*   `fun`
-*   `if`
-*   `else`
-*   `while`
-*   `for`
-*   `return`
-*   `break`
-*   `continue`
-*   `true`
-*   `false`
-*   `print`
-*   `include`
-*   `switch`
-*   `case`
-*   `default`
-*   `is`
-*   `in`
-*   `try`
-*   `catch`
-*   `throw`
-*   `async`
-*   `await`
-
-These are case-sensitive and are only used for type checking (e.g. `var n = 123; print(n is Num);`)
-*   `List`
-*   `Map`
-*   `Date`
-*   `Duration`
-*   `String`
-*   `Num`
-*   `Bool`
-
-This frees you to use the lowercase version of (some) them as variable names.
-```js
-// This is valid
-var list = [1, 2, 3];
-
-// This is not valid
-var List = [1, 2, 3];
-```
-
-Not reserved in the language definition sense, these words are still reserved during runtime because they are used for built-in functions:
-
-*   `now`
-*   `date`
-*   `duration`
-*   `parseDateTime`
-*   `dart`
-*   `out`
-*   `wait`
-*   `quit`
-*   `jsonEncode`
-*   `jsonDecode`
-*   `rndDouble`
-*   `rndInt`
-*   `rndBool`
-
 
 ## Supported Types
 [Back To Table Of Contents](#table-of-contents)
@@ -970,6 +945,72 @@ Let's say you have a script library called `utils.oche` that you want to include
 Using include directives is a compile-time preprocessor operation, and is platform specific.  OcheScript provides an interface for writing your own preprocessor based on your platform.  For example on Windows, a preprocessor might use `dart:io` to find include files in the current directory and the /include sub-directory.  A Flutter implementation might look for include files in the flutter assets bundle.
 
 See [Windows Example](http://github.com/atebitftw/ochescript/blob/main/lib/windows_preprocessor.dart).
+
+## Reserved Keywords
+[Back To Table Of Contents](#table-of-contents)
+
+The following words are reserved (case-sensitive):
+*   `class`
+*   `super`
+*   `this`
+*   `extends`
+*   `var`
+*   `fun`
+*   `if`
+*   `else`
+*   `while`
+*   `for`
+*   `return`
+*   `break`
+*   `continue`
+*   `true`
+*   `false`
+*   `print`
+*   `include`
+*   `switch`
+*   `case`
+*   `default`
+*   `is`
+*   `in`
+*   `try`
+*   `catch`
+*   `throw`
+*   `async`
+*   `await`
+
+These are case-sensitive and are only used for type checking (e.g. `var n = 123; print(n is Num);`)
+*   `List`
+*   `Map`
+*   `Date`
+*   `Duration`
+*   `String`
+*   `Num`
+*   `Bool`
+
+This frees you to use the lowercase version of (some) them as variable names.
+```js
+// This is valid
+var list = [1, 2, 3];
+
+// This is not valid
+var List = [1, 2, 3];
+```
+
+Not reserved in the language definition sense, these words are still reserved during runtime because they are used for built-in functions:
+
+*   `now`
+*   `date`
+*   `duration`
+*   `parseDateTime`
+*   `dart`
+*   `out`
+*   `wait`
+*   `quit`
+*   `jsonEncode`
+*   `jsonDecode`
+*   `rndDouble`
+*   `rndInt`
+*   `rndBool`
 
 ## Runtime Stack Size Limits
 [Back To Table Of Contents](#table-of-contents)
