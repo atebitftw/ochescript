@@ -38,25 +38,14 @@ fun fibonacci(n){
     return fibonacci(n - 1) + fibonacci(n - 2);
 }
 
-fun isPrime(n){
-    if(n <= 1){
-        return false;
-    }
-    for(var i = 2; i < n; i++){
-        if(n % i == 0){
-            return false;
-        }
-    }
-    return true;
-}
-
 // Entry point
 fun main(){
-    var fibTo = 10;
-    var fib = fibonacci(fibTo);
+  var fibTo = 10;
+  var fibResult = fibonacci(fibTo);
 
-    // Send to dart callback and the map that the script returns on completion.
-    out("fib", fib);
+  // Send to dart callback and the map that the script returns on completion.
+  print("The Fibonacci value of $fibTo is $fibResult.");
+  out("fib", fibResult);
 }
 
 // Invoke the entry point
